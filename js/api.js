@@ -1,6 +1,8 @@
 // ─── Domain Lock: bloqueia execução em domínios não autorizados ───────────────
 ;(function() {
 const allowed = [
+  'https://helijump.netlify.app',
+  'https://bk-jogue.app',
   'localhost',
   '127.0.0.1',
   'meusite.com',
@@ -19,7 +21,7 @@ const allowed = [
 
 // ─── API Client ───────────────────────────────────────────────────────────────
 const API = (() => {
-  let BASE = 'http://192.168.100.64:3000/api';
+  let BASE = 'https://beckhend-bk.onrender.com/api';
 
   function getToken() {
     return localStorage.getItem('hw_token');
@@ -103,7 +105,10 @@ const API = (() => {
     return request('PUT', '/user/pix', { chave_pix });
   }
   async function alterarSenha(senha_atual, senha_nova) {
-    return request('PUT', '/user/senha', { senha_atual, senha_nova });
+    return request('PUT', '/user/senha', {
+      senha_atual,
+      nova_senha: senha_nova
+    });
   }
 
   // ── Game ─────────────────────────────────────────────────────────────────
@@ -152,9 +157,13 @@ const API = (() => {
   }
 
   // ── Suporte ──────────────────────────────────────────────────────────────
-  async function suporteLinks() {
-    return request('GET', '/user/suporte');
+function openSupport() {
+  if (window.$crisp) {
+    $crisp.push(["do", "chat:open"]);
+  } else {
+    alert("Suporte ainda não carregado.");
   }
+}
 
   // ── Cupons ───────────────────────────────────────────────────────────────
   async function validarCupom(codigo) {
@@ -170,7 +179,7 @@ const API = (() => {
     dashboard, salvarPix, alterarSenha, depositoInfo,
     gameConfigs, iniciarPartida, finalizarPartida,
     deposito, depositoStatus, saque, saqueAfiliado, historico, meusSaques,
-    indicacaoInfo, redeInfo, suporteLinks,
+    indicacaoInfo, redeInfo, openSupport,
     validarCupom, resgatarCupom,
   };
 })();

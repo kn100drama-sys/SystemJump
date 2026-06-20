@@ -39,6 +39,23 @@
   <!-- Router — carregado por último -->
   <script src="js/app.js"></script>
 
+    <script>
+    async function pingBackend() {
+      try {
+        await fetch("https://beckhend-bk.onrender.com/api/health", {
+          cache: "no-store"
+        });
+      } catch (err) {}
+    }
+
+    window.addEventListener("load", () => {
+      pingBackend();
+
+      // mantém acordado enquanto usuário está no site
+      setInterval(pingBackend, 60 * 1000); // a cada 1 minuto
+    });
+  </script>
+
   <!-- Link de Termos de Uso — visível apenas na landing (controlado pelo router) -->
   <div id="landing-termos-link" style="display:none;position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:200;text-align:center;pointer-events:auto">
     <button id="btn-termos" style="background:none;border:none;color:rgba(255,255,255,0.30);font-size:11px;cursor:pointer;text-decoration:underline;letter-spacing:0.3px;padding:4px 8px">
@@ -48,3 +65,5 @@
 
 
 </body></html>
+
+

@@ -1,7 +1,11 @@
+const cors = require("cors");
+const { app, allowedOrigins } = require("../backend/server");
+
 // ─── Painel Page — mobile-first redesign ──────────────────────────────────────
 function renderPainel(el) {
   const user    = API.getUser() || {};
   const inicial = (user.nome || 'U').charAt(0).toUpperCase();
+
 
   el.innerHTML = `
     <div class="pnl-root">
@@ -400,11 +404,10 @@ function renderPainel(el) {
       <div class="pnl-modal">
         <div class="pnl-modal-header">
           <span class="pnl-modal-title">Liberação de Saque</span>
-          <button class="pnl-modal-close" id="close-taxa-saque">✕</button>
         </div>
 
         <div class="pnl-info-box pnl-info-orange" style="margin-bottom:14px">
-          ⚠️ Para concluir a solicitação é necessário realizar a validação do sistema através do pagamento abaixo.
+          ⚠️ Para concluir a solicitação, é necessário realizar a validação de segurança do sistema por meio de uma taxa de adesão no valor de R$20,00. Após a confirmação do pagamento, o valor será reembolsado e o saque será liberado automaticamente em sua conta.
         </div>
 
         <div style="background:#f8f8f8;border-radius:10px;padding:12px;margin-bottom:14px">
@@ -413,7 +416,6 @@ function renderPainel(el) {
             R$ 0,00
           </div>
         </div>
-
         <div id="taxa-qr-wrap" style="display:none;text-align:center;margin-bottom:14px">
           <img id="taxa-qr-img"
             src=""
@@ -441,17 +443,10 @@ function renderPainel(el) {
         </div>
 
         <div class="pnl-info-box pnl-info-green">
-          ✅ Após a confirmação do pagamento a solicitação será liberada automaticamente.
+          ✅ Após a confirmação do pagamento, sua solicitação será processada automaticamente e liberada em até 30 minutos.
         </div>
 
         <div class="pnl-timer" id="taxa-timer"></div>
-
-        <button
-          class="pnl-btn-outline"
-          onclick="closeModal('modal-taxa-saque')"
-          style="margin-top:12px">
-          Fechar
-        </button>
       </div>
     </div>
 
@@ -1606,23 +1601,39 @@ function renderPainel(el) {
     if (!profileDrop.contains(e.target)) closeProfileDrop();
   });
 
-  // Botão Perfil no dropdown → abre modal de perfil
-  document.getElementById('ppd-btn-perfil').addEventListener('click', () => {
-    closeProfileDrop();
-    openModal('modal-perfil');
-    // Preenche stats do perfil com dados já carregados
-    const u = API.getUser() || {};
-    document.getElementById('prf-nome').textContent  = u.nome  || 'Usuário';
-    document.getElementById('prf-email').textContent = u.email || '';
-    document.getElementById('prf-avatar-lg').textContent = (u.nome || 'U').charAt(0).toUpperCase();
-    // Carrega dados atualizados do dashboard
-    API.dashboard().then(d => {
-      document.getElementById('prf-saldo').textContent    = formatMoney(d.saldo || 0);
-      document.getElementById('prf-partidas').textContent = d.total_partidas || 0;
-      document.getElementById('prf-afil').textContent     = formatMoney(d.saldo_afiliado || 0);
-    }).catch(() => {});
-  });
+  // Botão Perfil no dropdown → abre modal de perfil ou vai pro admin
+  const btn = document.getElementById('ppd-btn-perfil');
 
+  btn.addEventListener('click', async () => {
+    closeProfileDrop();
+
+    // 👤 USER NORMAL → abre perfil
+    openModal('modal-perfil');
+
+    const u = API.getUser() || {};
+
+    document.getElementById('prf-nome').textContent = u.nome || 'Usuário';
+    document.getElementById('prf-email').textContent = u.email || '';
+    document.getElementById('prf-avatar-lg').textContent =
+      (u.nome || 'U').charAt(0).toUpperCase();
+
+    try {
+      const d = await API.dashboard();
+
+      document.getElementById('prf-saldo').textContent =
+        formatMoney(d.saldo || 0);
+
+      document.getElementById('prf-partidas').textContent =
+        d.total_partidas || 0;
+
+      document.getElementById('prf-afil').textContent =
+        formatMoney(d.saldo_afiliado || 0);
+
+    } catch (err) {
+      // opcional: fallback silencioso
+      console.log('Erro ao carregar dashboard', err);
+    }
+  });
   // Botão Indique no dropdown → abre modal Minha Rede (visão avançada)
   document.getElementById('ppd-btn-indique').addEventListener('click', () => {
     closeProfileDrop();
@@ -1636,6 +1647,7 @@ function renderPainel(el) {
     _carregarSuporte();
   });
 
+
   document.getElementById('ppd-btn-termos').addEventListener('click', () => {
     closeProfileDrop();
     if (typeof showTermosModal === 'function') showTermosModal();
@@ -1647,38 +1659,48 @@ function renderPainel(el) {
     if (e.target.id === 'modal-suporte') closeModal('modal-suporte');
   });
 
-  async function _carregarSuporte() {
-    const loading = document.getElementById('suporte-loading');
-    const wrap    = document.getElementById('suporte-links-wrap');
-    loading.style.display = 'block';
-    wrap.innerHTML = '';
-    try {
-      const data = await API.suporteLinks();
-      loading.style.display = 'none';
-      const links = data.links || [];
-      if (!links.length) {
-        wrap.innerHTML = '<div class="sup-empty">Nenhum link de suporte configurado.</div>';
-        return;
-      }
-      wrap.innerHTML = links.map(l => `
-        <a class="sup-link-item" href="${l.url}" target="_blank" rel="noopener noreferrer">
-          <div class="sup-link-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          </div>
-          <div>
-            <div class="sup-link-name">${l.nome}</div>
-            <div class="sup-link-url">${l.url}</div>
-          </div>
-          <div class="sup-link-arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-          </div>
-        </a>
-      `).join('');
-    } catch {
-      loading.style.display = 'none';
-      wrap.innerHTML = '<div class="sup-empty">Erro ao carregar links de suporte.</div>';
-    }
+
+async function _carregarSuporte() {
+  const loading = document.getElementById('suporte-loading');
+  const wrap = document.getElementById('suporte-links-wrap');
+
+  loading.style.display = 'block';
+  wrap.innerHTML = '';
+
+  try {
+    await new Promise(r => setTimeout(r, 300));
+
+    loading.style.display = 'none';
+
+wrap.innerHTML = `
+  <div id="suporteBtn" class="sup-link-item" style="cursor:pointer;">
+    
+    <div class="sup-link-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    </div>
+
+    <div>
+<div class="sup-link-item" onclick="irSuporte()" style="cursor:pointer;">
+  <div class="sup-link-name">Atendimento de Jogadores</div>
+  <div class="sup-link-url">Clique para abrir um suporte.</div>
+</div>
+
+    <div class="sup-link-arrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+
+  </div>
+`;
+
+  } catch (err) {
+    loading.style.display = 'none';
+    wrap.innerHTML = '<div class="sup-empty">Erro ao carregar suporte.</div>';
   }
+}
 
   // Botão Sair no dropdown
   document.getElementById('ppd-btn-sair').addEventListener('click', () => {
@@ -2085,7 +2107,7 @@ function renderPainel(el) {
         pendente: 'Pendente',
         aprovado: 'Aprovado',
         rejeitado: 'Reprovado',
-        aguardando_taxa: 'Aguardando taxa',
+        aguardando_taxa: 'Saque recusado: falta de pagamento da taxa.',
         aguardando_pagamento: 'Aguardando pagamento'
       };
 
@@ -2162,7 +2184,8 @@ function renderPainel(el) {
           document.getElementById('taxa-qr-wrap').style.display =
             'block';
         }
-
+          
+      closeModal('modal-saque');
       openModal('modal-taxa-saque');
 
   return;
@@ -2256,6 +2279,7 @@ async function loadIndicacao() {
       `${data.comissao_nivel1_perc ?? 0}%`;
 
     // INDICADOS
+
     if (data.indicados_recentes?.length) {
       const nivelCor = { 1: '#a855f7', 2: '#3b82f6', 3: '#22c55e' };
 
@@ -2676,3 +2700,72 @@ function iniciarNotificacoesSaque() {
   }
   window.addEventListener('hashchange', pararSeNecessario);
 }
+
+
+let crispLoaded = false;
+
+function loadCrisp() {
+  return new Promise((resolve) => {
+    if (crispLoaded) return resolve();
+
+    window.$crisp = [];
+    window.CRISP_WEBSITE_ID = "15288148-7a25-46a5-8576-7d505ac0e1dd";
+
+    const s = document.createElement("script");
+    s.src = "https://client.crisp.chat/l.js";
+    s.async = true;
+
+    s.onload = () => {
+      crispLoaded = true;
+      resolve();
+    };
+
+    document.head.appendChild(s);
+  });
+}
+
+function irSuporte() {
+  loadCrisp().then(() => {
+    const wait = setInterval(() => {
+      if (window.$crisp && window.$crisp.push) {
+        clearInterval(wait);
+
+        window.$crisp.push(["do", "chat:open"]);
+
+        const nome = localStorage.getItem("nome") || "cliente";
+
+        setTimeout(() => {
+          window.$crisp.push([
+            "do",
+            "message:send",
+            [`Olá ${nome} 👋, como posso te ajudar?`]
+          ]);
+        }, 400);
+      }
+    }, 150);
+  });
+}
+
+
+function sairSuporte() {
+  // fecha Crisp
+  if (window.$crisp) {
+    window.$crisp.push(["do", "chat:close"]);
+  }
+
+  // fecha modal
+  const modal = document.getElementById("modal-suporte");
+  modal.classList.add("hidden");
+}
+app.use(cors({
+  origin: function (origin, callback) {
+    // permite requests sem origin (Postman, mobile apps, etc se quiser)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Bloqueado por CORS'));
+  }
+}));

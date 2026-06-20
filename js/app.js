@@ -13,7 +13,7 @@ window.invalidatePublicCfgCache = function() { _publicCfgCache = null; };
 
 async function applyBranding() {
   const cfg = await getPublicConfig();
-  const nome     = cfg.site_nome      || 'HelixJump';
+  const nome     = cfg.site_nome      || 'Bk Jump';
   const suporte  = cfg.site_suporte   || '';
   const promo    = cfg.site_promo     || '';
   const logoUrl  = cfg.site_logo_url  || null;

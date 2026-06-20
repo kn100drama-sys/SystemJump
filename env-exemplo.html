@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BkzinPro — Painel Admin</title>
+<style>
+  :root{
+    --bg-0:#0c0a14;
+    --bg-1:#13101f;
+    --bg-2:#181426;
+    --panel:#161224;
+    --panel-border:#2a2440;
+    --purple:#8b5cf6;
+    --purple-2:#7c3aed;
+    --purple-soft:rgba(139,92,246,.15);
+    --text-0:#f5f3fa;
+    --text-1:#b6b0c9;
+    --text-2:#7d7794;
+    --green:#22c55e;
+    --green-soft:rgba(34,197,94,.12);
+    --red:#ef4444;
+    --red-soft:rgba(239,68,68,.12);
+    --orange:#f59e0b;
+    --orange-soft:rgba(245,158,11,.12);
+    --blue:#3b82f6;
+    --blue-soft:rgba(59,130,246,.12);
+    --radius:16px;
+    --radius-sm:10px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  body{
+    background: radial-gradient(circle at 15% 0%, #1c1530 0%, var(--bg-0) 45%);
+    color: var(--text-0);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    min-height:100vh;
+    display:flex;
+  }
+
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; }
+
+  /* ───────── SIDEBAR ───────── */
+  .sidebar{
+    width:220px;
+    flex-shrink:0;
+    background: var(--bg-1);
+    border-right:1px solid var(--panel-border);
+    display:flex;
+    flex-direction:column;
+    padding:22px 16px;
+    position:sticky;
+    top:0;
+    height:100vh;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:0 8px 22px;
+    font-size:19px;
+    font-weight:700;
+    letter-spacing:-.02em;
+  }
+  .brand .bk{ color:var(--text-0); }
+  .brand .pro{ color:var(--purple); }
+  .brand .logo-dot{
+    width:30px; height:30px; border-radius:9px;
+    background: linear-gradient(135deg, var(--purple), #6366f1);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px;
+  }
+
+  .nav-section{
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.09em;
+    color:var(--text-2);
+    margin: 18px 8px 8px;
+  }
+  .nav-section:first-of-type{ margin-top:4px; }
+
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    border-radius:var(--radius-sm);
+    font-size:14px;
+    color:var(--text-1);
+    font-weight:500;
+    transition: background .15s, color .15s;
+    cursor:pointer;
+  }
+  .nav-item .ic{ width:18px; text-align:center; font-size:15px; }
+  .nav-item:hover{ background: rgba(255,255,255,.04); color:var(--text-0); }
+  .nav-item.active{
+    background: linear-gradient(135deg, var(--purple-2), #6d28d9);
+    color:#fff;
+    box-shadow: 0 4px 14px rgba(124,58,237,.35);
+  }
+
+  .sidebar-footer{
+    margin-top:auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .admin-card{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px;
+    border-radius:var(--radius-sm);
+    background: rgba(255,255,255,.03);
+  }
+  .admin-avatar{
+    width:34px; height:34px; border-radius:50%;
+    background: linear-gradient(135deg, var(--purple), #4338ca);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:14px;
+  }
+  .admin-name{ font-size:13.5px; font-weight:600; }
+  .admin-role{ font-size:11px; color:var(--text-2); }
+  .logout-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:10px;
+    border-radius:var(--radius-sm);
+    border:1px solid var(--panel-border);
+    background:transparent;
+    color:var(--text-1);
+    font-size:13px;
+    font-weight:500;
+  }
+  .logout-btn:hover{ background: rgba(255,255,255,.04); color:var(--text-0); }
+
+  /* ───────── MAIN ───────── */
+  .main{
+    flex:1;
+    min-width:0;
+    padding: 22px 28px 40px;
+  }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:22px;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .topbar-title{ display:flex; align-items:center; gap:12px; }
+  .topbar-icon{
+    width:38px; height:38px; border-radius:10px;
+    background: var(--purple-soft);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--purple);
+    font-size:17px;
+  }
+  .topbar h1{ font-size:19px; font-weight:700; letter-spacing:-.01em; }
+  .topbar p{ font-size:12.5px; color:var(--text-2); margin-top:1px; }
+
+  .topbar-actions{ display:flex; align-items:center; gap:10px; }
+  .pill{
+    display:flex; align-items:center; gap:7px;
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12.5px;
+    font-weight:600;
+    border:1px solid var(--panel-border);
+    background: var(--panel);
+  }
+  .pill.online{ color:var(--green); border-color: rgba(34,197,94,.3); }
+  .pill.online .dot{ width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); }
+  .pill.refresh{ color:var(--text-0); }
+  .pill.refresh:hover{ background: rgba(255,255,255,.05); }
+  .pill.date{ color:var(--text-1); font-weight:500; }
+
+  .welcome{
+    position:relative;
+    overflow:hidden;
+    border-radius:var(--radius);
+    background: linear-gradient(120deg, #4c2a8c 0%, #2c1a52 45%, #1a1330 100%);
+    border:1px solid var(--panel-border);
+    padding:26px 28px;
+    margin-bottom:22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+  }
+  .welcome h2{ font-size:20px; font-weight:700; margin-bottom:6px; }
+  .welcome p{ font-size:13.5px; color:#d8d2ea; }
+  .welcome-chart{ flex-shrink:0; opacity:.9; }
+
+  .grid{
+    display:grid;
+    gap:16px;
+  }
+  .grid-5{ grid-template-columns: repeat(5, 1fr); margin-bottom:16px; }
+  .grid-3{ grid-template-columns: repeat(3, 1fr); }
+
+  @media (max-width:1200px){
+    .grid-5{ grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width:760px){
+    .grid-5, .grid-3{ grid-template-columns: 1fr 1fr; }
+    .sidebar{ display:none; }
+  }
+
+  .stat-card, .metric-card{
+    background: var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:var(--radius);
+    padding:18px;
+  }
+
+  .stat-card{ display:flex; flex-direction:column; gap:10px; }
+  .stat-icon{
+    width:38px; height:38px; border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px;
+  }
+  .stat-value{ font-size:21px; font-weight:700; letter-spacing:-.01em; }
+  .stat-label{ font-size:12.5px; color:var(--text-1); }
+  .stat-sub{ font-size:11.5px; font-weight:600; margin-top:-4px; }
+
+  .metric-card{ display:flex; flex-direction:column; gap:10px; min-height:118px; }
+  .metric-top{ display:flex; align-items:center; gap:12px; }
+  .metric-icon{
+    width:40px; height:40px; border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px;
+  }
+  .metric-label{ font-size:12.5px; color:var(--text-1); }
+  .metric-value{ font-size:23px; font-weight:700; letter-spacing:-.01em; }
+  .metric-sub{ font-size:11.5px; font-weight:600; display:flex; align-items:center; gap:4px; }
+
+  .c-purple{ background: var(--purple-soft); color:#a78bfa; }
+  .c-green{ background: var(--green-soft); color:#4ade80; }
+  .c-orange{ background: var(--orange-soft); color:#fbbf24; }
+  .c-blue{ background: var(--blue-soft); color:#60a5fa; }
+  .c-red{ background: var(--red-soft); color:#f87171; }
+
+  .metric-card.purple{ background: linear-gradient(160deg, rgba(124,58,237,.16), rgba(124,58,237,.03)); border-color: rgba(139,92,246,.25); }
+  .metric-card.green{ background: linear-gradient(160deg, rgba(34,197,94,.14), rgba(34,197,94,.02)); border-color: rgba(34,197,94,.25); }
+  .metric-card.red{ background: linear-gradient(160deg, rgba(239,68,68,.14), rgba(239,68,68,.02)); border-color: rgba(239,68,68,.25); }
+  .metric-card.orange{ background: linear-gradient(160deg, rgba(245,158,11,.14), rgba(245,158,11,.02)); border-color: rgba(245,158,11,.25); }
+  .metric-card.blue{ background: linear-gradient(160deg, rgba(59,130,246,.14), rgba(59,130,246,.02)); border-color: rgba(59,130,246,.25); }
+  .metric-card.teal{ background: linear-gradient(160deg, rgba(99,102,241,.14), rgba(99,102,241,.02)); border-color: rgba(99,102,241,.25); }
+
+  .sub-green{ color:#4ade80; }
+  .sub-red{ color:#f87171; }
+  .sub-orange{ color:#fbbf24; }
+  .sub-blue{ color:#60a5fa; }
+  .sub-muted{ color:var(--text-2); }
+
+  .skeleton{
+    display:inline-block;
+    width:70px; height:18px;
+    border-radius:5px;
+    background: linear-gradient(90deg, rgba(255,255,255,.05), rgba(255,255,255,.12), rgba(255,255,255,.05));
+    background-size:200% 100%;
+    animation: shimmer 1.3s infinite;
+  }
+  @keyframes shimmer{ 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+  .footer-bar{
+    display:flex; justify-content:space-between;
+    margin-top:26px;
+    font-size:11.5px;
+    color:var(--text-2);
+  }
+
+  .toast{
+    position:fixed; bottom:24px; right:24px;
+    background: var(--panel);
+    border:1px solid var(--panel-border);
+    padding:12px 18px;
+    border-radius:var(--radius-sm);
+    font-size:13px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+    display:none;
+    z-index:50;
+  }
+  .toast.show{ display:block; }
+  .toast.error{ border-color: rgba(239,68,68,.4); color:#fca5a5; }
+  .toast.success{ border-color: rgba(34,197,94,.4); color:#86efac; }
+
+  .login-wrap{
+    min-height:100vh; width:100%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .login-card{
+    width:360px;
+    background: var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:var(--radius);
+    padding:30px;
+  }
+  .login-card h1{ font-size:18px; margin-bottom:4px; }
+  .login-card p{ font-size:12.5px; color:var(--text-2); margin-bottom:20px; }
+  .login-card label{ font-size:12px; color:var(--text-1); display:block; margin:14px 0 6px; }
+  .login-card input{
+    width:100%; padding:10px 12px;
+    background: var(--bg-1); border:1px solid var(--panel-border);
+    border-radius:var(--radius-sm); color:var(--text-0); font-size:13.5px;
+  }
+  .login-card input:focus{ outline:none; border-color:var(--purple); }
+  .login-card button{
+    width:100%; margin-top:20px; padding:11px;
+    background: linear-gradient(135deg, var(--purple-2), #6d28d9);
+    border:none; border-radius:var(--radius-sm);
+    color:#fff; font-weight:600; font-size:13.5px;
+  }
+  .login-error{ color:#f87171; font-size:12.5px; margin-top:10px; min-height:16px; }
+
+  /* ═══════════════════════════════════════════════════
+     MOBILE HEADER + BOTTOM NAV (ocultos no desktop)
+     ═══════════════════════════════════════════════════ */
+  .mobile-header{ display:none; }
+  .bottom-nav{ display:none; }
+  .section-head{ display:none; }
+
+  /* ═══════════════════════════════════════════════════
+     MOBILE LAYOUT — igual à referência (≤760px)
+     Reorganiza sidebar/topbar em header + bottom nav,
+     sem tocar no markup nem no JS.
+     ═══════════════════════════════════════════════════ */
+  @media (max-width:760px){
+
+    body{ display:block; }
+
+    /* ── topbar (desktop) escondida, header mobile no lugar ── */
+    .topbar{ display:none; }
+
+    .mobile-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px;
+      position:sticky;
+      top:0;
+      z-index:30;
+      background: rgba(12,10,20,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--panel-border);
+    }
+    .mobile-header .mh-side{ display:flex; align-items:center; gap:10px; width:40px; }
+    .mobile-header .mh-side.right{ justify-content:flex-end; gap:10px; }
+    .mh-burger, .mh-bell{
+      width:38px; height:38px; border-radius:11px;
+      border:1px solid var(--panel-border);
+      background: var(--panel);
+      display:flex; align-items:center; justify-content:center;
+      font-size:15px; color:var(--text-0);
+      position:relative;
+      flex-shrink:0;
+    }
+    .mh-bell .dot{
+      position:absolute; top:7px; right:7px;
+      width:7px; height:7px; border-radius:50%;
+      background: var(--purple); box-shadow:0 0 6px var(--purple);
+    }
+    .mh-brand{
+      font-size:18px; font-weight:700; letter-spacing:-.02em;
+      white-space:nowrap;
+    }
+    .mh-brand .bk{ color:var(--text-0); }
+    .mh-brand .pro{ color:var(--purple); }
+    .mh-avatar{
+      width:38px; height:38px; border-radius:50%; flex-shrink:0;
+      background: linear-gradient(135deg, var(--purple), #4338ca);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:14px; color:#fff;
+    }
+
+    .main{ padding: 14px 16px 100px; }
+
+    /* welcome card: empilha texto, ilustração vira faixa de fundo */
+    .welcome{
+      flex-direction:column;
+      align-items:flex-start;
+      padding:20px 18px;
+      gap:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .welcome h2{ font-size:18px; }
+    .welcome p{ font-size:13px; max-width:75%; }
+    .welcome-chart{
+      position:absolute;
+      right:-10px; top:50%; transform:translateY(-50%);
+      width:170px; height:auto;
+      opacity:.55;
+      pointer-events:none;
+    }
+
+    /* ── stat cards: 2 colunas, ícone+número lado a lado ── */
+    .grid-5{
+      grid-template-columns: 1fr 1fr;
+      margin-bottom:14px;
+    }
+    .grid-5 .stat-card:nth-child(5){
+      grid-column: 1 / -1;
+    }
+    .grid-5 .stat-card{
+      display:grid;
+      grid-template-columns: 38px 1fr;
+      grid-template-rows: auto auto auto;
+      column-gap:12px;
+      row-gap:1px;
+      padding:14px;
+    }
+    .grid-5 .stat-card .stat-icon{ grid-row: 1 / 4; align-self:center; }
+    .grid-5 .stat-card .stat-value{ font-size:18px; grid-column:2; }
+    .grid-5 .stat-card .stat-label{ font-size:11.5px; grid-column:2; }
+    .grid-5 .stat-card .stat-sub{ font-size:10.5px; grid-column:2; margin-top:0; }
+    .grid-5 .stat-card:nth-child(5){
+      grid-template-columns: 44px 1fr;
+    }
+    .grid-5 .stat-card:nth-child(5) .stat-value{ font-size:21px; }
+
+    /* "Visão Geral Financeira" section header before the metric grid */
+    .section-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin: 6px 2px 12px;
+    }
+    .section-head h3{ font-size:15px; font-weight:700; }
+    .section-head .see-all{
+      display:flex; align-items:center; gap:4px;
+      font-size:12px; font-weight:600;
+      color:#d8b4fe;
+      background: var(--purple-soft);
+      border:1px solid rgba(139,92,246,.35);
+      padding:6px 12px;
+      border-radius:999px;
+    }
+
+    /* metric cards: icon | label(top)+value(bottom) | full-width sub line */
+    .grid-3{
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    .metric-card{
+      display:grid;
+      grid-template-columns: 42px 1fr;
+      grid-template-rows: auto auto auto;
+      column-gap:12px;
+      row-gap:5px;
+      align-items:start;
+      min-height:unset;
+      padding:16px;
+    }
+    .metric-card .metric-top{
+      display:contents;
+    }
+    .metric-card .metric-icon{
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
+      align-self:start;
+    }
+    .metric-card .metric-label{
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+      align-self:center;
+      font-size:13px;
+      line-height:1.3;
+      color:var(--text-1);
+      font-weight:500;
+    }
+    .metric-card .metric-value{
+      grid-column: 1 / 3;
+      grid-row: 2 / 3;
+      font-size:21px;
+      line-height:1.25;
+      font-weight:700;
+    }
+    .metric-card .metric-sub{
+      grid-column: 1 / 3;
+      grid-row: 3 / 4;
+      font-size:11px;
+      line-height:1.4;
+      margin-top:2px;
+    }
+
+    .footer-bar{ display:none; }
+
+    /* ── bottom nav ── */
+    .bottom-nav{
+      display:flex;
+      position:fixed;
+      bottom:0; left:0; right:0;
+      background: rgba(15,12,24,.92);
+      backdrop-filter: blur(12px);
+      border-top:1px solid var(--panel-border);
+      padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+      z-index:40;
+    }
+    .bn-item{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:3px;
+      padding:6px 2px;
+      border-radius:12px;
+      color:var(--text-2);
+      font-size:10.5px;
+      font-weight:600;
+      background:none;
+      border:none;
+    }
+    .bn-item .bn-ic{ font-size:18px; line-height:1; }
+    .bn-item.active{ color:#fff; }
+    .bn-item.active .bn-ic{
+      background: linear-gradient(135deg, var(--purple-2), #6d28d9);
+      width:34px; height:26px;
+      border-radius:9px;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 4px 12px rgba(124,58,237,.4);
+    }
+
+    .toast{ left:16px; right:16px; bottom:84px; }
+
+    .login-card{ width:88vw; max-width:360px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═════════ LOGIN SCREEN ═════════ -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-card">
+    <h1>BkzinPro Admin</h1>
+    <p>Entre com sua conta de administrador</p>
+    <label>Telefone</label>
+    <input id="loginTelefone" type="text" placeholder="DDD + número" />
+    <label>Senha</label>
+    <input id="loginSenha" type="password" placeholder="••••••••" />
+    <button id="loginBtn">Entrar</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ═════════ DASHBOARD ═════════ -->
+<div id="dashboardScreen" style="display:none; width:100%;">
+
+  <!-- Header mobile (visível apenas em telas pequenas) -->
+  <div class="mobile-header">
+    <div class="mh-side">
+      <button class="mh-burger" id="mhBurger" aria-label="Menu">☰</button>
+    </div>
+    <div class="mh-brand"><span class="bk">Bkzin</span><span class="pro">Pro</span></div>
+    <div class="mh-side right">
+      <button class="mh-bell" aria-label="Notificações"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="dot"></span></button>
+      <div class="mh-avatar" id="mhAvatarInitial">A</div>
+    </div>
+  </div>
+
+  <div style="display:flex; width:100%;">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9Z"/><path d="M11 3 8 9l4 12 4-12-3-6"/><path d="M2 9h20"/></svg></div>
+        <span><span class="bk">Bkzin</span><span class="pro">Pro</span></span>
+      </div>
+
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active" data-view="dashboard"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span> Dashboard</div>
+
+      <div class="nav-section">Financeiro</div>
+      <div class="nav-item" data-view="saques"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span> Número de saques pendentes.</div>
+      <div class="nav-item" data-view="depositos"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></span> Depósitos</div>
+      <div class="nav-item" data-view="transacoes"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 3 4 4-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/></svg></span> Transações</div>
+
+      <div class="nav-section">Usuários</div>
+      <div class="nav-item" data-view="usuarios"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></span> Usuários</div>
+      <div class="nav-item" data-view="partidas"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M8 11v3"/><path d="M6.5 12.5h3"/><circle cx="16" cy="11" r=".8" fill="currentColor"/><circle cx="18" cy="13.5" r=".8" fill="currentColor"/></svg></span> Partidas</div>
+
+      <div class="nav-section">Sistema</div>
+      <div class="nav-item" data-view="config"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V20a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H10a1.7 1.7 0 0 0 1-1.6V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V10a1.7 1.7 0 0 0 1.6 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1Z"/></svg></span> Configurações</div>
+      <div class="nav-item" data-view="logs"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/></svg></span> Logs</div>
+
+      <div class="sidebar-footer">
+        <div class="admin-card">
+          <div class="admin-avatar" id="adminInitial">A</div>
+          <div>
+            <div class="admin-name" id="adminName">admin</div>
+            <div class="admin-role">super</div>
+          </div>
+        </div>
+        <button class="logout-btn" id="logoutBtn">⇥ Sair do painel</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-title">
+          <div class="topbar-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></div>
+          <div>
+            <h1>Dashboard</h1>
+            <p>Visão geral completa da plataforma</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="pill online"><span class="dot"></span> Online</div>
+          <button class="pill refresh" id="refreshBtn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg> Atualizar</button>
+          <div class="pill date" id="dateNow">—</div>
+        </div>
+      </div>
+
+      <div class="welcome">
+        <div>
+          <h2><svg class="wave-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6.3-3.4l-3.1-5a1.8 1.8 0 0 1 3-2L8 14"/></svg> Bem-vindo de volta, <span id="welcomeName">admin</span>!</h2>
+          <p>Aqui está o resumo completo da plataforma.</p>
+        </div>
+        <svg class="welcome-chart" width="240" height="70" viewBox="0 0 240 70" fill="none">
+          <polyline points="0,55 30,48 60,50 90,38 120,40 150,22 180,28 210,12 240,8"
+            stroke="#a78bfa" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="0" cy="55" r="3" fill="#a78bfa"/><circle cx="30" cy="48" r="3" fill="#a78bfa"/>
+          <circle cx="60" cy="50" r="3" fill="#a78bfa"/><circle cx="90" cy="38" r="3" fill="#a78bfa"/>
+          <circle cx="120" cy="40" r="3" fill="#a78bfa"/><circle cx="150" cy="22" r="3" fill="#a78bfa"/>
+          <circle cx="180" cy="28" r="3" fill="#a78bfa"/><circle cx="210" cy="12" r="3" fill="#a78bfa"/>
+          <circle cx="240" cy="8" r="4" fill="#fff"/>
+        </svg>
+      </div>
+
+      <!-- ROW 1: 5 stat cards -->
+      <div class="grid grid-5">
+        <div class="stat-card">
+          <div class="stat-icon c-purple"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="8.5" r="2.6"/><path d="M16 14.3c2.7.4 4.5 2.3 4.5 5.7"/></svg></div>
+          <div class="stat-value" id="s_usuarios_totais"><span class="skeleton"></span></div>
+          <div class="stat-label">Usuários Totais</div>
+          <div class="stat-sub sub-green" id="s_usuarios_hoje">+0 hoje</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon c-green"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v9"/><path d="M9.5 9.5c0-1.2 1-2 2.5-2s2.5.8 2.5 2-1 1.7-2.5 2-2.5.8-2.5 2 1 2 2.5 2 2.5-.8 2.5-2"/></svg></div>
+          <div class="stat-value" id="s_depositos_hoje"><span class="skeleton"></span></div>
+          <div class="stat-label">Depósitos Hoje</div>
+          <div class="stat-sub sub-muted" id="s_depositos_hoje_total">Total: R$ 0,00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon c-orange"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12"/><path d="M6 22h12"/><path d="M6 2c0 4.5 3 6 6 8 3-2 6-3.5 6-8"/><path d="M6 22c0-4.5 3-6 6-8 3 2 6 3.5 6 8"/></svg></div>
+          <div class="stat-value" id="s_saques_pendentes_qtd"><span class="skeleton"></span></div>
+          <div class="stat-label">Saques Pendentes</div>
+          <div class="stat-sub sub-orange" id="s_saques_pendentes_total">R$ 0,00 aguardando</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon c-blue"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M8 11v3"/><path d="M6.5 12.5h3"/><circle cx="16" cy="11" r=".8" fill="currentColor"/><circle cx="18" cy="13.5" r=".8" fill="currentColor"/></svg></div>
+          <div class="stat-value" id="s_partidas_hoje"><span class="skeleton"></span></div>
+          <div class="stat-label">Partidas Hoje</div>
+          <div class="stat-sub sub-muted" id="s_partidas_total">Total: 0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon c-purple"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9Z"/><path d="M11 3 8 9l4 12 4-12-3-6"/><path d="M2 9h20"/></svg></div>
+          <div class="stat-value" id="s_saldo_plataforma"><span class="skeleton"></span></div>
+          <div class="stat-label">Saldo na Plataforma</div>
+        </div>
+      </div>
+
+      <!-- ROW 2 + 3: metric cards -->
+      <div class="section-head">
+        <h3>Visão Geral Financeira</h3>
+        <span class="see-all">Ver tudo <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+      </div>
+      <div class="grid grid-3">
+        <div class="metric-card purple">
+          <div class="metric-top">
+            <div class="metric-icon c-purple"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M16 12h.01"/><path d="M3 9h14a3 3 0 0 1 3 3v0"/></svg></div>
+            <div class="metric-label">Total Apostado</div>
+          </div>
+          <div class="metric-value" id="m_total_apostado"><span class="skeleton"></span></div>
+          <div class="metric-sub sub-muted">Valor total <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5" stroke-linecap="round"/><circle cx="12" cy="8" r=".6" fill="currentColor" stroke="none"/></svg></div>
+        </div>
+
+        <div class="metric-card green">
+          <div class="metric-top">
+            <div class="metric-icon c-green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg></div>
+            <div class="metric-label">Total Ganhos</div>
+          </div>
+          <div class="metric-value" id="m_total_ganhos"><span class="skeleton"></span></div>
+          <div class="metric-sub sub-green" id="m_taxa_vitoria">Saldo ganho jogando <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 6H4.5A1.5 1.5 0 0 0 3 7.5C3 9.5 4.5 11 7 11"/><path d="M17 6h2.5A1.5 1.5 0 0 1 21 7.5C21 9.5 19.5 11 17 11"/></svg></div>
+        </div>
+
+        <div class="metric-card red">
+          <div class="metric-top">
+            <div class="metric-icon c-red"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 6 6 4-4 8 8"/><path d="M17 17h4v-4"/></svg></div>
+            <div class="metric-label">Total Perdas</div>
+          </div>
+          <div class="metric-value" id="m_total_perdas"><span class="skeleton"></span></div>
+          <div class="metric-sub sub-red">Perdas nos jogos <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7 10 10"/><path d="M17 7v10H7"/></svg></div>
+        </div>
+
+        <div class="metric-card orange">
+          <div class="metric-top">
+            <div class="metric-icon c-orange"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12"/><path d="M6 22h12"/><path d="M6 2c0 4.5 3 6 6 8 3-2 6-3.5 6-8"/><path d="M6 22c0-4.5 3-6 6-8 3 2 6 3.5 6 8"/></svg></div>
+            <div class="metric-label">Depósitos Pendentes</div>
+          </div>
+          <div class="metric-value" id="m_depositos_pendentes"><span class="skeleton"></span></div>
+          <div class="metric-sub sub-orange">Depósitos em processamento <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M10.3 3.9 2.5 18a1.5 1.5 0 0 0 1.3 2.2h16.4a1.5 1.5 0 0 0 1.3-2.2L13.7 3.9a1.5 1.5 0 0 0-2.6 0Z"/><circle cx="12" cy="16.2" r=".7" fill="currentColor" stroke="none"/></svg></div>
+        </div>
+
+        <div class="metric-card green">
+          <div class="metric-top">
+            <div class="metric-icon c-green"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 6.5v11"/><path d="M9 9c0-1.4 1.2-2.3 3-2.3s3 .9 3 2.3-1.2 2-3 2.3-3 .9-3 2.4 1.2 2.3 3 2.3 3-.9 3-2.3"/></svg></div>
+            <div class="metric-label">Ganhos Brutos</div>
+          </div>
+          <div class="metric-value" id="m_ganhos_brutos"><span class="skeleton"></span></div>
+          <div class="metric-sub sub-green" id="m_lucro_perc">Lucro da Casa <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m17 17-10-10"/><path d="M7 17V7h10"/></svg></div>
+        </div>
+
+        <div class="metric-card blue">
+          <div class="metric-top">
+            <div class="metric-icon c-blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10 12 4l9 6"/><path d="M5 10v9"/><path d="M9 10v9"/><path d="M15 10v9"/><path d="M19 10v9"/><path d="M3 21h18"/></svg></div>
+            <div class="metric-label">Total Depósitos</div>
+          </div>
+          <div class="metric-value" id="m_total_depositos"><span class="skeleton"></span></div>
+          <div class="metric-sub sub-blue">Todos os depósitos realizados</div>
+        </div>
+
+        <div class="metric-card teal">
+          <div class="metric-top">
+            <div class="metric-icon c-blue"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></div>
+            <div class="metric-label">Depósitos Pagos</div>
+          </div>
+          <div class="metric-value" id="m_depositos_pagos"><span class="skeleton"></span></div>
+          <div class="metric-sub sub-blue" id="m_depositos_pagos_perc">Depósitos concluídos 0% <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.5 2.5L16 9.5"/></svg></div>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <span>© 2026 BkzinPro. Todos os direitos reservados.</span>
+        <span>Versão 2.0.0</span>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom nav mobile (visível apenas em telas pequenas) -->
+  <nav class="bottom-nav">
+    <button class="bn-item active" data-view="dashboard"><span class="bn-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>Dashboard</button>
+    <button class="bn-item" data-view="usuarios"><span class="bn-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></span>Usuários</button>
+    <button class="bn-item" data-view="depositos"><span class="bn-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg></span>Depósitos</button>
+    <button class="bn-item" data-view="transacoes"><span class="bn-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 3 4 4-4 4"/><path d="M3 7h18"/><path d="m7 21-4-4 4-4"/><path d="M21 17H3"/></svg></span>Transações</button>
+    <button class="bn-item" data-view="mais"><span class="bn-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="5" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r=".9" fill="currentColor" stroke="none"/></svg></span>Mais</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════
+const API_BASE = 'https://beckhend-bk.onrender.com';
+
+let authToken = localStorage.getItem('admin_token') || null;
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function brl(valor) {
+  return Number(valor || 0).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+async function api(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      ...(options.headers || {})
+    }
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    if (path !== '/api/auth/login') {
+      logout();
+      throw new Error('Sessão expirada ou acesso negado');
+    }
+  }
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data.error || 'Erro na requisição');
+  }
+
+  return data;
+}
+
+function logout() {
+  authToken = null;
+  localStorage.removeItem('admin_token');
+  document.getElementById('dashboardScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+function updateClock() {
+  const el = document.getElementById('dateNow');
+  const now = new Date();
+  const dataStr = now.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  const horaStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  el.textContent = `📅 ${dataStr}, ${horaStr}`;
+}
+
+// ═══════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════
+document.getElementById('loginBtn').addEventListener('click', doLogin);
+document.getElementById('loginSenha').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  const telefone = document.getElementById('loginTelefone').value.trim();
+  const senha = document.getElementById('loginSenha').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+
+  if (!telefone || !senha) {
+    errEl.textContent = 'Preencha telefone e senha.';
+    return;
+  }
+
+  try {
+    const data = await api('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ telefone, senha })
+    });
+
+    if (!data.user?.isAdmin) {
+      errEl.textContent = 'Esta conta não tem permissão de administrador.';
+      return;
+    }
+
+    authToken = data.token;
+    localStorage.setItem('admin_token', authToken);
+    enterDashboard(data.user);
+
+  } catch (err) {
+    errEl.textContent = err.message || 'Erro ao entrar';
+  }
+}
+
+document.getElementById('logoutBtn').addEventListener('click', logout);
+
+function enterDashboard(user) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboardScreen').style.display = 'block';
+
+  const nome = user?.nome || 'admin';
+  document.getElementById('adminName').textContent = nome;
+  document.getElementById('adminInitial').textContent = nome.charAt(0).toUpperCase();
+  document.getElementById('welcomeName').textContent = nome;
+  const mhAvatar = document.getElementById('mhAvatarInitial');
+  if (mhAvatar) mhAvatar.textContent = nome.charAt(0).toUpperCase();
+
+  loadDashboard();
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD DATA
+// ═══════════════════════════════════════════
+async function loadDashboard() {
+  try {
+    const d = await api('/api/admin/dashboard');
+
+    document.getElementById('s_usuarios_totais').textContent = d.usuarios_totais ?? 0;
+    document.getElementById('s_usuarios_hoje').textContent = `+${d.usuarios_hoje ?? 0} hoje`;
+
+    document.getElementById('s_depositos_hoje').textContent = brl(d.depositos_hoje_total);
+    document.getElementById('s_depositos_hoje_total').textContent = `Total: ${brl(d.depositos_hoje_total)}`;
+
+    document.getElementById('s_saques_pendentes_qtd').textContent = d.saques_pendentes_qtd ?? 0;
+    document.getElementById('s_saques_pendentes_total').textContent = `${brl(d.saques_pendentes_total)} aguardando`;
+
+    document.getElementById('s_partidas_hoje').textContent = d.partidas_hoje ?? 0;
+    document.getElementById('s_partidas_total').textContent = `Total: ${d.partidas_hoje ?? 0}`;
+
+    document.getElementById('s_saldo_plataforma').textContent = brl(d.saldo_plataforma);
+
+    document.getElementById('m_total_apostado').textContent = brl(d.total_apostado);
+
+    document.getElementById('m_total_ganhos').textContent = brl(d.total_ganhos);
+    document.getElementById('m_taxa_vitoria').textContent = `Ganhos nos jogos ↗`;
+
+    document.getElementById('m_total_perdas').textContent = brl(d.total_perdas);
+
+    document.getElementById('m_depositos_pendentes').textContent = brl(d.depositos_pendentes_total);
+
+    document.getElementById('m_ganhos_brutos').textContent = brl(d.ganhos_brutos);
+    document.getElementById('m_lucro_perc').textContent = `Lucro da Casa.`;
+
+    document.getElementById('m_total_depositos').textContent = brl(d.total_depositos);
+
+    document.getElementById('m_depositos_pagos').textContent = brl(d.depositos_pagos_total);
+    document.getElementById('m_depositos_pagos_perc').textContent = `Depósitos concluídos ${(d.depositos_pagos_perc ?? 0).toFixed(0)}% ✓`;
+
+  } catch (err) {
+    showToast(err.message || 'Erro ao carregar dashboard', 'error');
+  }
+}
+
+document.getElementById('refreshBtn').addEventListener('click', () => {
+  loadDashboard();
+  showToast('Dashboard atualizado', 'success');
+});
+
+// Atualiza automaticamente a cada 30s
+setInterval(loadDashboard, 30000);
+setInterval(updateClock, 1000);
+updateClock();
+
+// ═══════════════════════════════════════════
+// BOOTSTRAP — tenta restaurar sessão
+// ═══════════════════════════════════════════
+(async function bootstrap() {
+  if (!authToken) return; // fica na tela de login
+
+  try {
+    const data = await api('/api/auth/me');
+    if (!data.user?.isAdmin) {
+      logout();
+      return;
+    }
+    enterDashboard(data.user);
+  } catch {
+    logout();
+  }
+})();
+</script>
+</body>
+</html>
