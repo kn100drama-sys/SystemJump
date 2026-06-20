@@ -1,4 +1,5 @@
 // ─── Domain Lock: bloqueia execução em domínios não autorizados ───────────────
+/*
 ;(function() {
 const allowed = [
   'https://helijump.netlify.app',
@@ -10,14 +11,13 @@ const allowed = [
   '192.168.100.64'
 ];
 
-  if (!allowed.includes(location.hostname)) {
-    document.documentElement.innerHTML =
-      '<body style="background:#000;color:#f00;font-family:monospace;padding:40px">' +
-      '<h1>Acesso Negado</h1><p>Este sistema não está autorizado a funcionar neste domínio.</p>' +
-      '</body>';
-    throw new Error('Unauthorized domain');
-  }
+if (!allowed.includes(location.hostname)) {
+  document.documentElement.innerHTML =
+    '<body><h1>Acesso Negado</h1></body>';
+  throw new Error('Unauthorized domain');
+}
 })();
+*/
 
 // ─── API Client ───────────────────────────────────────────────────────────────
 const API = (() => {
