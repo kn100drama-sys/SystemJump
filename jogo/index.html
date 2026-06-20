@@ -1,0 +1,201 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#fff0f0">
+  <meta property="og:title" content="Helix Jump">
+  <title>Helix Jump</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      background: #FFE4EE;
+    }
+
+    #game-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+      background: linear-gradient(to bottom, #FFE4EE, #FFB3CB);
+    }
+
+    #game-container canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+
+    #ui-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* 🔥 START SCREEN */
+    #start-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(6px);
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    #start-screen.hidden {
+      display: none;
+    }
+
+    /* ✨ TEXTO PRINCIPAL (AJUSTADO) */
+    #start-screen p {
+      font-size: 22px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ffffff;
+
+      text-shadow:
+        0 0 6px rgba(168, 85, 247, 0.8),
+        0 0 14px rgba(168, 85, 247, 0.5);
+
+      opacity: 0.95;
+      animation: softGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes softGlow {
+      from {
+        transform: scale(1);
+        text-shadow:
+          0 0 5px rgba(168, 85, 247, 0.5),
+          0 0 10px rgba(168, 85, 247, 0.3);
+      }
+      to {
+        transform: scale(1.02);
+        text-shadow:
+          0 0 10px rgba(168, 85, 247, 0.8),
+          0 0 18px rgba(168, 85, 247, 0.6);
+      }
+    }
+
+    /* ⬇ SETA MENOR BRANCA */
+    #start-screen .arrow {
+      font-size: 24px;
+      color: #ffffff;
+      margin-top: 10px;
+      opacity: 0.9;
+      animation: bounce-arrow 1.2s ease-in-out infinite;
+    }
+
+    @keyframes bounce-arrow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
+    /* SCORE */
+    #score {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 64px;
+      font-weight: bold;
+      color: #1a1a2e;
+      pointer-events: none;
+    }
+
+    /* GAME OVER */
+    #game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      display: none;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.93);
+      padding: 36px 52px;
+      border-radius: 20px;
+    }
+
+    #game-over.visible {
+      display: block;
+      pointer-events: auto;
+    }
+
+    #game-over h2 {
+      margin-bottom: 16px;
+      color: #1a1a2e;
+      font-size: 30px;
+    }
+
+    #game-over p {
+      margin-bottom: 8px;
+      color: #555;
+      font-size: 18px;
+    }
+
+    #game-over .restart-btn {
+      margin-top: 24px;
+      padding: 14px 36px;
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+      background: #e91e63;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #game-over .restart-btn:hover {
+      background: #c2185b;
+    }
+
+  </style>
+
+  <script type="module" src="js/index-Bayz75v7.js"></script>
+</head>
+
+<body>
+  <div id="game-container">
+    <canvas id="canvas"></canvas>
+
+    <div id="ui-overlay">
+      <div id="start-screen">
+        <p>Toque para jogar</p>
+        <span class="arrow">↓</span>
+      </div>
+
+      <div id="score">0</div>
+
+      <div id="game-over">
+        <h2>Game Over</h2>
+        <p>Score: <span id="final-score">0</span></p>
+        <p>Recorde: <span id="record">0</span></p>
+        <button class="restart-btn">Jogar Novamente</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
