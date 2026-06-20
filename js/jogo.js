@@ -5,6 +5,12 @@
 //  • Meta = valor_entrada × multiplicador — indica quando o botão de resgate aparece
 //  • Jogador ESCOLHE quando parar clicando em "Resgatar"
 //  • Se morrer sem resgatar: perde o valor de entrada
+async function carregarConfig() {
+  const res = await fetch("/api/public/config");
+  const data = await res.json();
+
+  temaAtual = data.theme || "padrao";
+}
 
 async function renderJogo(container) {
   // Ler dificuldade ANTES de montar o HTML para que o iframe já nasça com src correto
@@ -291,6 +297,9 @@ async function renderJogo(container) {
   window.executarResgate = executarResgate;
   window.jogarNovamente  = jogarNovamente;
   window.voltarPainel    = voltarPainel;
+  window.addEventListener("DOMContentLoaded", async () => {
+  await carregarConfig();
+});
 
   // ── Estado da partida ─────────────────────────────────────────────────────
   let partida            = null;
@@ -299,6 +308,7 @@ async function renderJogo(container) {
   let metaAtingida        = false;
   let resgatou            = false;
   let partidaFinalizada   = false;
+  let temaAtual = "padrao";
 
   // ── Heartbeat: rastreamento server-side de plataformas ────────────────────
   let _lastHeartbeatAt   = 0;
@@ -1033,8 +1043,8 @@ async function renderJogo(container) {
   function mostrarModalDemo(valorGanho, resgatou) {
     const overlay = document.getElementById('tela-resultado');
     const displayValor = valorGanho > 0 ? valorGanho : parseFloat(valor_meta);
-    const copa = _isCopaMapa();
-    const pascoa = _isPascoaMapa();
+    const copa = temaAtual === "copa";
+    const pascoa = temaAtual === "pascoa";
 
     const trophySvg = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="38" height="38">
               <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
