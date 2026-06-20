@@ -5,14 +5,23 @@
 //  • Meta = valor_entrada × multiplicador — indica quando o botão de resgate aparece
 //  • Jogador ESCOLHE quando parar clicando em "Resgatar"
 //  • Se morrer sem resgatar: perde o valor de entrada
-async function carregarConfig() {
-  const res = await fetch("/api/public/config");
-  const data = await res.json();
 
-  temaAtual = data.theme || "padrao";
+let temaAtual = "padrao"; // Definido globalmente para ser acessível por todas as funções
+
+async function carregarConfig() {
+  try {
+    const res = await fetch("/api/public/config");
+    const data = await res.json();
+    temaAtual = data.theme || "padrao";
+  } catch (e) {
+    temaAtual = "padrao";
+  }
 }
 
 async function renderJogo(container) {
+  // Carregar configuração de tema antes de renderizar
+  await carregarConfig();
+
   // Ler dificuldade ANTES de montar o HTML para que o iframe já nasça com src correto
   let _difInicial = 'normal';
   try {
@@ -293,13 +302,10 @@ async function renderJogo(container) {
     </style>
   `;
 
-  // ── Expor funções globais necessárias pelos botões inline ─────────────────
+  // ── Expor funções globais necessária
   window.executarResgate = executarResgate;
   window.jogarNovamente  = jogarNovamente;
   window.voltarPainel    = voltarPainel;
-  window.addEventListener("DOMContentLoaded", async () => {
-  await carregarConfig();
-});
 
   // ── Estado da partida ─────────────────────────────────────────────────────
   let partida            = null;
@@ -308,7 +314,6 @@ async function renderJogo(container) {
   let metaAtingida        = false;
   let resgatou            = false;
   let partidaFinalizada   = false;
-  let temaAtual = "padrao";
 
   // ── Heartbeat: rastreamento server-side de plataformas ────────────────────
   let _lastHeartbeatAt   = 0;
@@ -441,7 +446,7 @@ async function renderJogo(container) {
     window.gameEvents.onMorreu = async () => {
       if (resgatou || partidaFinalizada) return;
       partidaFinalizada              = true;
-      window.gameEvents.partidaAtiva = false;
+      window.gameEvents.partivaAtiva = false;
       esconderHUD();
       esconderBotaoResgatar();
       _pararMusicaCopa();
@@ -634,378 +639,101 @@ async function renderJogo(container) {
       btn.style.display = 'none';
       mostrarVitoria({
         saldo_novo: null,
-        valor_ganho_ou_perdido: valorAcumulado,
+        valor_gan_ou_perdido: valorAcumulado,
         plataformas_passadas: plataformasPassadas,
       });
     }
   }
 
   // ── Telas de resultado ────────────────────────────────────────────────────
-
-  // _mapaConfig existe DENTRO do iframe (main.js), não no parent.
-  // Lemos via contentWindow para detectar o mapa ativo.
-  function _isCopaMapa() {
-    try {
-      const iw = document.getElementById('game-iframe')?.contentWindow;
-      return (iw?._mapaConfig || {}).mapa_ativo === 'Copa';
-    } catch (_) { return false; }
-  }
-
-  function _isPascoaMapa() {
-    try {
-      const iw = document.getElementById('game-iframe')?.contentWindow;
-      return (iw?._mapaConfig || {}).mapa_ativo === 'Pascoa';
-    } catch (_) { return false; }
-  }
-
-  /** mapa: copa | pascoa | padrao */
-  function _estilizarBotoesResultado(tipo, mapa = 'padrao') {
-    const btnJogar  = document.querySelector('#tela-resultado button[onclick="jogarNovamente()"]');
-    const btnPainel = document.querySelector('#tela-resultado button[onclick="voltarPainel()"]');
-    if (!btnJogar || !btnPainel) return;
-
-    if (mapa === 'copa') {
-      if (tipo === 'vitoria') {
-        btnJogar.style.background  = 'linear-gradient(135deg,#009C3B,#00782D)';
-        btnJogar.style.boxShadow   = '0 4px 20px rgba(0,156,59,.5)';
-        btnPainel.style.border     = '1.5px solid rgba(255,215,0,.35)';
-        btnPainel.style.color      = '#FFD700';
-      } else {
-        btnJogar.style.background  = 'linear-gradient(135deg,#B71C1C,#D32F2F)';
-        btnJogar.style.boxShadow   = '0 4px 20px rgba(183,28,28,.5)';
-        btnPainel.style.border     = '1.5px solid rgba(239,68,68,.35)';
-        btnPainel.style.color      = '#EF5350';
-      }
-      return;
-    }
-    if (mapa === 'pascoa') {
-      if (tipo === 'vitoria') {
-        btnJogar.style.background  = 'linear-gradient(135deg,#059669,#10b981,#34d399)';
-        btnJogar.style.boxShadow   = '0 4px 22px rgba(16,185,129,.52)';
-        btnPainel.style.border     = '1.5px solid rgba(244,114,182,.45)';
-        btnPainel.style.color      = '#fce7f3';
-      } else {
-        btnJogar.style.background  = 'linear-gradient(135deg,#ea580c,#fb923c)';
-        btnJogar.style.boxShadow   = '0 4px 22px rgba(234,88,12,.48)';
-        btnPainel.style.border     = '1.5px solid rgba(167,139,250,.5)';
-        btnPainel.style.color      = '#e9d5ff';
-      }
-      return;
-    }
-    btnJogar.style.background  = 'linear-gradient(135deg,#FF6B9D,#c026d3)';
-    btnJogar.style.boxShadow   = '0 4px 20px rgba(255,107,157,.4)';
-    btnPainel.style.border     = '1.5px solid rgba(255,255,255,.15)';
-    btnPainel.style.color      = 'rgba(255,255,255,.75)';
-  }
-
-  // Para a música do mapa Copa (HTML5 Audio, módulo do iframe)
-  function _pararMusicaCopa() {
-    try {
-      const iw = document.getElementById('game-iframe')?.contentWindow;
-      if (iw && typeof iw._stopCopaAudio === 'function') iw._stopCopaAudio();
-    } catch (_) {}
-  }
-
   function mostrarVitoria(res) {
-    const valor = res.valor_ganho_ou_perdido ?? valorAcumulado;
-    const plat  = res.plataformas_passadas  ?? plataformasPassadas;
-    const copa  = _isCopaMapa();
-    const pascoa = _isPascoaMapa();
+    const v = parseFloat(res.valor_ganho_ou_perdido || 0);
+    const copa = temaAtual === "copa";
+    const pascoa = temaAtual === "pascoa";
 
-    const card = document.getElementById('resultado-card');
-    const topo = document.getElementById('resultado-topo');
+    document.getElementById('resultado-topo').style.background =
+      copa ? 'linear-gradient(160deg,rgba(255,215,0,.18) 0%,rgba(0,156,59,.10) 100%)' :
+      pascoa ? 'linear-gradient(160deg,rgba(52,211,153,.2) 0%,rgba(244,114,182,.12) 100%)' :
+      'linear-gradient(160deg,rgba(0,201,122,.15) 0%,transparent 100%)';
+
     const iconWrap = document.getElementById('resultado-icon-wrap');
-    const vWrap = document.getElementById('resultado-valor-wrap');
+    iconWrap.style.background =
+      copa ? 'linear-gradient(135deg,#FFD700,#FFA000)' :
+      pascoa ? 'linear-gradient(135deg,#34d399,#10b981,#a78bfa)' :
+      'linear-gradient(135deg,#00C97A,#00A362)';
+    iconWrap.style.boxShadow =
+      copa ? '0 0 40px rgba(255,215,0,.4)' :
+      pascoa ? '0 0 40px rgba(52,211,153,.4)' :
+      '0 0 40px rgba(0,201,122,.3)';
+    iconWrap.innerHTML = copa ? '⚽' : pascoa ? '🥚' : '🏆';
+    iconWrap.style.animation = 'iconPop .6s cubic-bezier(.34,1.56,.64,1) both';
 
-    if (copa) {
-      // ── Tema Copa do Mundo — vitória ──
-      card.style.border = '1.5px solid rgba(255,215,0,.7)';
-      card.style.boxShadow = '0 32px 80px rgba(0,0,0,.8), 0 0 80px rgba(255,215,0,.25), 0 0 120px rgba(0,156,59,.12)';
-      card.style.background = 'linear-gradient(170deg,#0a1628 0%,#0d2010 60%,#0a1628 100%)';
+    const titulo = document.getElementById('resultado-titulo');
+    titulo.textContent = copa ? 'GOOOOL!' : pascoa ? 'FELIZ PÁSCOA!' : 'VITÓRIA!';
+    titulo.style.color = copa ? '#FFD700' : pascoa ? '#6ee7b7' : '#00C97A';
 
-      topo.style.background = 'linear-gradient(160deg,rgba(255,215,0,.18) 0%,rgba(0,156,59,.10) 100%)';
+    document.getElementById('resultado-subtitulo').textContent = 'Resgate realizado com sucesso!';
 
-      iconWrap.style.background = 'linear-gradient(135deg,#FFD700,#FFA000)';
-      iconWrap.style.boxShadow  = '0 0 50px rgba(255,215,0,.7)';
-      iconWrap.style.animation  = 'iconPop .55s cubic-bezier(.34,1.56,.64,1) both';
-      // Ícone: troféu da copa
-      iconWrap.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>';
+    const valorWrap = document.getElementById('resultado-valor-wrap');
+    valorWrap.style.background =
+      copa ? 'linear-gradient(135deg,rgba(255,215,0,.18),rgba(0,156,59,.10))' :
+      pascoa ? 'linear-gradient(135deg,rgba(52,211,153,.18),rgba(167,139,250,.1))' :
+      'rgba(0,201,122,.1)';
+    valorWrap.style.border =
+      copa ? '1px solid rgba(255,215,0,.35)' :
+      pascoa ? '1px solid rgba(52,211,153,.32)' :
+      '1px solid rgba(0,201,122,.2)';
 
-      document.getElementById('resultado-titulo').textContent = '🏆 É CAMPEÃO!';
-      document.getElementById('resultado-titulo').style.color = '#FFD700';
-      document.getElementById('resultado-subtitulo').textContent = `Você passou ${plat} plataforma${plat !== 1 ? 's' : ''} e levantou a taça! 🇧🇷`;
+    document.getElementById('resultado-valor-label').textContent = 'VALOR RECEBIDO';
+    document.getElementById('resultado-valor-label').style.color = copa ? '#FFD700' : pascoa ? '#6ee7b7' : '#00C97A';
+    document.getElementById('resultado-valor').textContent = `+ ${formatMoney(v)}`;
+    document.getElementById('resultado-valor').style.color = copa ? '#FFD700' : pascoa ? '#6ee7b7' : '#00C97A';
 
-      vWrap.style.background = 'linear-gradient(135deg,rgba(255,215,0,.18),rgba(0,156,59,.10))';
-      vWrap.style.border     = '1px solid rgba(255,215,0,.35)';
-      document.getElementById('resultado-valor-label').textContent = '⚽ PRÊMIO DA COPA';
-      document.getElementById('resultado-valor-label').style.color = '#FFD700';
-      document.getElementById('resultado-valor').textContent = `+ ${formatMoney(valor)}`;
-      document.getElementById('resultado-valor').style.color = '#FFD700';
-
-      document.getElementById('resultado-plat').textContent =
-        `${plat} plataformas × ${formatMoney(valor_por_plataforma)} = ${formatMoney(valor)}`;
-
-    } else if (pascoa) {
-      // ── Tema Páscoa — vitória ──
-      card.style.border = '1.5px solid rgba(244,114,182,.55)';
-      card.style.boxShadow = '0 32px 80px rgba(0,0,0,.78), 0 0 70px rgba(16,185,129,.22), 0 0 90px rgba(244,114,182,.12)';
-      card.style.background = 'linear-gradient(170deg,#0f172a 0%,#134e4a 45%,#1e1b4b 100%)';
-
-      topo.style.background = 'linear-gradient(160deg,rgba(52,211,153,.2) 0%,rgba(244,114,182,.12) 100%)';
-
-      iconWrap.style.background = 'linear-gradient(135deg,#34d399,#10b981,#a78bfa)';
-      iconWrap.style.boxShadow  = '0 0 48px rgba(52,211,153,.55)';
-      iconWrap.style.animation  = 'iconPop .55s cubic-bezier(.34,1.56,.64,1) both';
-      iconWrap.innerHTML = `<span style="font-size:40px;line-height:1" aria-hidden="true">🥚</span>`;
-
-      document.getElementById('resultado-titulo').textContent = '🐰 CESTA CHEIA!';
-      document.getElementById('resultado-titulo').style.color = '#6ee7b7';
-      document.getElementById('resultado-subtitulo').textContent =
-        `Você passou ${plat} plataforma${plat !== 1 ? 's' : ''} e encheu a cesta de ovos!`;
-
-      vWrap.style.background = 'linear-gradient(135deg,rgba(52,211,153,.2),rgba(167,139,250,.12))';
-      vWrap.style.border     = '1px solid rgba(52,211,153,.35)';
-      document.getElementById('resultado-valor-label').textContent = '🌷 PRÊMIO DA PÁSCOA';
-      document.getElementById('resultado-valor-label').style.color = '#a7f3d0';
-      document.getElementById('resultado-valor').textContent = `+ ${formatMoney(valor)}`;
-      document.getElementById('resultado-valor').style.color = '#6ee7b7';
-
-      document.getElementById('resultado-plat').textContent =
-        `${plat} plataformas × ${formatMoney(valor_por_plataforma)} = ${formatMoney(valor)}`;
-
-    } else {
-      // ── Tema padrão — dourado ──
-      card.style.border = '1.5px solid rgba(255,215,0,.5)';
-      card.style.boxShadow = '0 32px 80px rgba(0,0,0,.7), 0 0 60px rgba(255,215,0,.15)';
-      card.style.background = '';
-
-      topo.style.background = 'linear-gradient(160deg,rgba(255,180,0,.12) 0%,rgba(255,215,0,.05) 100%)';
-
-      iconWrap.style.background = 'linear-gradient(135deg,#f59e0b,#fbbf24)';
-      iconWrap.style.boxShadow  = '0 0 40px rgba(251,191,36,.5)';
-      iconWrap.style.animation  = 'iconPop .55s cubic-bezier(.34,1.56,.64,1) both';
-      iconWrap.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>';
-
-      document.getElementById('resultado-titulo').textContent  = 'PRÊMIO RESGATADO!';
-      document.getElementById('resultado-titulo').style.color  = '#fbbf24';
-      document.getElementById('resultado-subtitulo').textContent = `Você passou ${plat} plataforma${plat !== 1 ? 's' : ''} e resgatou o prêmio!`;
-
-      vWrap.style.background = 'linear-gradient(135deg,rgba(251,191,36,.15),rgba(245,158,11,.08))';
-      vWrap.style.border     = '1px solid rgba(251,191,36,.25)';
-      document.getElementById('resultado-valor-label').textContent = 'VOCÊ GANHOU';
-      document.getElementById('resultado-valor-label').style.color = '#fbbf24';
-      document.getElementById('resultado-valor').textContent = `+ ${formatMoney(valor)}`;
-      document.getElementById('resultado-valor').style.color = '#fbbf24';
-
-      document.getElementById('resultado-plat').textContent =
-        `${plat} plataformas × ${formatMoney(valor_por_plataforma)} = ${formatMoney(valor)}`;
-    }
+    document.getElementById('resultado-plat').textContent =
+      `Você passou ${plataformasPassadas} plataforma${plataformasPassadas !== 1 ? 's' : ''}`;
 
     const saldoEl = document.getElementById('resultado-saldo');
     saldoEl.textContent = res.saldo_novo != null ? `Novo saldo: ${formatMoney(res.saldo_novo)}` : '';
     saldoEl.style.display = res.saldo_novo != null ? '' : 'none';
 
     document.getElementById('tela-resultado').style.display = 'flex';
+    dispararConfetti();
+
     if (copa) _estilizarBotoesResultado('vitoria', 'copa');
     else if (pascoa) _estilizarBotoesResultado('vitoria', 'pascoa');
     else _estilizarBotoesResultado('vitoria', 'padrao');
-    dispararConfetti();
-  }
-
-  function fraseDerrota() {
-    const meta  = parseFloat(valor_meta) || 1;
-    const perc  = Math.min(100, (valorAcumulado / meta) * 100);
-    const n     = plataformasPassadas;
-    if (perc >= 75) return [
-      `${Math.round(perc)}% da meta em ${n} plataformas — uma rodada e você resgata! 🔥`,
-      `Tão perto assim e vai deixar escapar? Jogar de novo! 💥`,
-      `${Math.round(perc)}% — você estava na reta final. Revanche agora! 🎯`,
-    ][Math.floor(Math.random() * 3)];
-    if (perc >= 50) return [
-      `${Math.round(perc)}% da meta com ${n} plataformas — você está melhorando! 🔥`,
-      `Mais da metade do caminho em ${n} plataformas. Tente de novo! 💪`,
-      `${n} plataformas passadas — você está pegando o ritmo. Revanche? ⚡`,
-    ][Math.floor(Math.random() * 3)];
-    if (perc >= 25) return [
-      `${n} plataformas passadas — você já sabe o que fazer. Jogar de novo! 🎯`,
-      `${Math.round(perc)}% da meta em ${n} plataformas. Vai ficar nisso? 😤`,
-      `Você chegou a ${Math.round(perc)}% — a próxima é sua! 💥`,
-    ][Math.floor(Math.random() * 3)];
-    return [
-      `${n} plataformas — na próxima vai mais longe. Tente de novo! 🚀`,
-      `Você passou ${n} plataformas. Agora que você sabe, vai mais fundo! ⚡`,
-      `Começo de jogo. Daqui a pouco você vai resgatar — jogar de novo! 🔥`,
-    ][Math.floor(Math.random() * 3)];
-  }
-
-  function tremerTela() {
-    const wrapper = document.getElementById('jogo-wrapper') || document.body;
-    if (!document.getElementById('shake-style')) {
-      const s = document.createElement('style');
-      s.id = 'shake-style';
-      s.textContent = `
-        @keyframes telaShake {
-          0%          { transform: translate(0,0) rotate(0deg); }
-          10%         { transform: translate(-8px,-4px) rotate(-1.2deg); }
-          20%         { transform: translate(8px,4px)  rotate(1.2deg); }
-          30%         { transform: translate(-6px,6px)  rotate(-0.8deg); }
-          40%         { transform: translate(6px,-6px) rotate(0.8deg); }
-          50%         { transform: translate(-4px,3px)  rotate(-0.5deg); }
-          60%         { transform: translate(4px,-3px) rotate(0.5deg); }
-          75%         { transform: translate(-2px,2px)  rotate(-0.2deg); }
-          90%         { transform: translate(2px,-1px) rotate(0.2deg); }
-          100%        { transform: translate(0,0) rotate(0deg); }
-        }
-        .tela-shake { animation: telaShake 0.3s ease-out both; }
-      `;
-      document.head.appendChild(s);
-    }
-    wrapper.classList.remove('tela-shake');
-    void wrapper.offsetWidth; // força reflow para reiniciar a animação
-    wrapper.classList.add('tela-shake');
-    wrapper.addEventListener('animationend', () => wrapper.classList.remove('tela-shake'), { once: true });
-  }
-
-  function fraseDerrotaCopa() {
-    const n = plataformasPassadas;
-    const frases = [
-      `O árbitro apitou o fim — mas a revanche é sua! 🔴`,
-      `${n} plataformas passadas — a próxima rodada você levanta a taça! ⚽`,
-      `Cartão vermelho para a sorte — jogar de novo e vencer! 🏆`,
-      `O jogo não acabou — entre em campo de novo! 💪`,
-      `${n} andares de garra — agora vai mais longe! 🇧🇷`,
-    ];
-    return frases[Math.floor(Math.random() * frases.length)];
-  }
-
-  function fraseDerrotaPascoa() {
-    const frases = [
-      'O ovo escorregou… mas a próxima ronda é tua!',
-      'Nem toda casca aguenta — tenta outra vez!',
-      'O coelho foi mais rápido desta vez. Volta à caça!',
-      'Quase apanhou o ovo dourado — continua!',
-      'A cesta ainda tem lugar — mais uma tentativa!',
-      'Não desanimes — até o melhor caçador falha às vezes.',
-      'A primavera traz novas chances. Joga de novo!',
-      'Perdeste um ovo, não a festa. Bora remontar!',
-      'Campo florido difícil hoje — aquece e volta.',
-      'Os coelhos ainda acreditam em ti. Continua!',
-    ];
-    return frases[Math.floor(Math.random() * frases.length)];
   }
 
   function mostrarDerrota(res) {
-    tremerTela();
-    const perdido = res.valor_ganho_ou_perdido ?? parseFloat(valor_entrada);
-    const meta    = parseFloat(valor_meta) || 1;
-    const perc    = Math.min(100, (valorAcumulado / meta) * 100);
-    const copa    = _isCopaMapa();
-    const pascoa  = _isPascoaMapa();
+    const perdido = parseFloat(res.valor_ganho_ou_perdido || valor_entrada);
+    const copa = temaAtual === "copa";
+    const pascoa = temaAtual === "pascoa";
 
-    const acumuladoMsg = metaAtingida
-      ? `Você tinha acumulado ${formatMoney(valorAcumulado)} mas não resgatou a tempo!`
-      : valorAcumulado > 0
-        ? `${formatMoney(valorAcumulado)} acumulados — ${Math.round(perc)}% da meta`
-        : `Você passou ${plataformasPassadas} plataforma${plataformasPassadas !== 1 ? 's' : ''}`;
+    document.getElementById('resultado-topo').style.background = 'linear-gradient(160deg,rgba(239,68,68,.15) 0%,transparent 100%)';
 
-    const card     = document.getElementById('resultado-card');
-    const topo     = document.getElementById('resultado-topo');
     const iconWrap = document.getElementById('resultado-icon-wrap');
-    const vWrap    = document.getElementById('resultado-valor-wrap');
+    iconWrap.style.background = 'linear-gradient(135deg,#ef4444,#b91c1c)';
+    iconWrap.style.boxShadow = '0 0 40px rgba(239,68,68,.3)';
+    iconWrap.innerHTML = '💀';
+    iconWrap.style.animation = 'iconPop .6s cubic-bezier(.34,1.56,.64,1) both';
 
-    if (copa) {
-      // ── Tema Copa do Mundo — derrota ──
-      card.style.border = '1.5px solid rgba(183,28,28,.7)';
-      card.style.boxShadow = '0 32px 80px rgba(0,0,0,.85), 0 0 70px rgba(183,28,28,.20)';
-      card.style.background = 'linear-gradient(170deg,#0a1628 0%,#1a0505 60%,#0a1628 100%)';
+    const titulo = document.getElementById('resultado-titulo');
+    titulo.textContent = 'FIM DE JOGO';
+    titulo.style.color = '#ef4444';
 
-      topo.style.background = 'linear-gradient(160deg,rgba(183,28,28,.15) 0%,rgba(10,22,40,.0) 100%)';
+    document.getElementById('resultado-subtitulo').textContent = 'Não foi desta vez. Tente novamente!';
 
-      // Ícone: cartão vermelho
-      iconWrap.style.background = 'linear-gradient(135deg,#B71C1C,#E53935)';
-      iconWrap.style.boxShadow  = '0 0 50px rgba(183,28,28,.6)';
-      iconWrap.style.animation  = 'iconPop .55s cubic-bezier(.34,1.56,.64,1) both';
-      iconWrap.innerHTML = `
-        <svg viewBox="0 0 24 24" width="30" height="36" fill="#fff" xmlns="http://www.w3.org/2000/svg">
-          <rect x="4" y="2" width="16" height="20" rx="2.5" ry="2.5" fill="#fff"/>
-        </svg>`;
+    const valorWrap = document.getElementById('resultado-valor-wrap');
+    valorWrap.style.background = 'rgba(239,68,68,.1)';
+    valorWrap.style.border = '1px solid rgba(239,68,68,.2)';
 
-      document.getElementById('resultado-titulo').textContent = '🟥 CARTÃO VERMELHO!';
-      document.getElementById('resultado-titulo').style.color = '#EF5350';
+    document.getElementById('resultado-valor-label').textContent = 'VALOR PERDIDO';
+    document.getElementById('resultado-valor-label').style.color = '#f87171';
+    document.getElementById('resultado-valor').textContent = `- ${formatMoney(perdido)}`;
+    document.getElementById('resultado-valor').style.color = '#f87171';
 
-      const motivMsg = fraseDerrotaCopa();
-      document.getElementById('resultado-subtitulo').innerHTML =
-        acumuladoMsg + `<br><span style="color:rgba(255,255,255,.75);font-style:italic">${motivMsg}</span>`;
-
-      vWrap.style.background = 'linear-gradient(135deg,rgba(183,28,28,.18),rgba(183,28,28,.06))';
-      vWrap.style.border     = '1px solid rgba(183,28,28,.35)';
-      document.getElementById('resultado-valor-label').textContent = '⚽ VALOR PERDIDO';
-      document.getElementById('resultado-valor-label').style.color = '#EF5350';
-      document.getElementById('resultado-valor').textContent = `- ${formatMoney(perdido)}`;
-      document.getElementById('resultado-valor').style.color = '#EF5350';
-
-      document.getElementById('resultado-plat').textContent =
-        `Você passou ${plataformasPassadas} plataforma${plataformasPassadas !== 1 ? 's' : ''}`;
-
-    } else if (pascoa) {
-      // ── Tema Páscoa — derrota ──
-      card.style.border = '1.5px solid rgba(251,146,60,.55)';
-      card.style.boxShadow = '0 32px 80px rgba(0,0,0,.82), 0 0 60px rgba(234,88,12,.18)';
-      card.style.background = 'linear-gradient(170deg,#0f172a 0%,#3b0764 55%,#1c1917 100%)';
-
-      topo.style.background = 'linear-gradient(160deg,rgba(251,146,60,.16) 0%,rgba(167,139,250,.08) 100%)';
-
-      iconWrap.style.background = 'linear-gradient(135deg,#ea580c,#f97316,#c084fc)';
-      iconWrap.style.boxShadow  = '0 0 44px rgba(234,88,12,.45)';
-      iconWrap.style.animation  = 'iconPop .55s cubic-bezier(.34,1.56,.64,1) both';
-      iconWrap.innerHTML = `<span style="font-size:36px;line-height:1" aria-hidden="true">🐣</span>`;
-
-      document.getElementById('resultado-titulo').textContent = 'Ovo partiu-se…';
-      document.getElementById('resultado-titulo').style.color = '#fdba74';
-
-      const motivMsg = fraseDerrotaPascoa();
-      document.getElementById('resultado-subtitulo').innerHTML =
-        acumuladoMsg + `<br><span style="color:rgba(255,255,255,.78);font-style:italic">${motivMsg}</span>`;
-
-      vWrap.style.background = 'linear-gradient(135deg,rgba(234,88,12,.16),rgba(124,58,237,.1))';
-      vWrap.style.border     = '1px solid rgba(251,146,60,.32)';
-      document.getElementById('resultado-valor-label').textContent = '🌷 VALOR PERDIDO';
-      document.getElementById('resultado-valor-label').style.color = '#fdba74';
-      document.getElementById('resultado-valor').textContent = `- ${formatMoney(perdido)}`;
-      document.getElementById('resultado-valor').style.color = '#fb923c';
-
-      document.getElementById('resultado-plat').textContent =
-        `Você passou ${plataformasPassadas} plataforma${plataformasPassadas !== 1 ? 's' : ''}`;
-
-    } else {
-      // ── Tema padrão — vermelho-rosa ──
-      card.style.border = '1.5px solid rgba(239,68,68,.45)';
-      card.style.boxShadow = '0 32px 80px rgba(0,0,0,.7), 0 0 60px rgba(239,68,68,.12)';
-      card.style.background = '';
-
-      topo.style.background = 'linear-gradient(160deg,rgba(239,68,68,.10) 0%,rgba(30,0,58,.0) 100%)';
-
-      iconWrap.style.background = 'linear-gradient(135deg,#ef4444,#f97316)';
-      iconWrap.style.boxShadow  = '0 0 40px rgba(239,68,68,.45)';
-      iconWrap.style.animation  = 'iconPop .55s cubic-bezier(.34,1.56,.64,1) both';
-      iconWrap.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
-
-      document.getElementById('resultado-titulo').textContent  = 'VOCÊ PERDEU!';
-      document.getElementById('resultado-titulo').style.color  = '#f87171';
-      const motivMsg = valorAcumulado > 0 && !metaAtingida ? fraseDerrota() : '';
-      document.getElementById('resultado-subtitulo').innerHTML =
-        acumuladoMsg + (motivMsg ? `<br><span style="color:rgba(255,255,255,.70);font-style:italic">${motivMsg}</span>` : '');
-
-      vWrap.style.background = 'linear-gradient(135deg,rgba(239,68,68,.13),rgba(239,68,68,.05))';
-      vWrap.style.border     = '1px solid rgba(239,68,68,.22)';
-      document.getElementById('resultado-valor-label').textContent = 'VALOR PERDIDO';
-      document.getElementById('resultado-valor-label').style.color = '#f87171';
-      document.getElementById('resultado-valor').textContent = `- ${formatMoney(perdido)}`;
-      document.getElementById('resultado-valor').style.color = '#f87171';
-
-      document.getElementById('resultado-plat').textContent =
-        `Você passou ${plataformasPassadas} plataforma${plataformasPassadas !== 1 ? 's' : ''}`;
-    }
+    document.getElementById('resultado-plat').textContent =
+      `Você passou ${plataformasPassadas} plataforma${plataformasPassadas !== 1 ? 's' : ''}`;
 
     const saldoEl = document.getElementById('resultado-saldo');
     saldoEl.textContent = res.saldo_novo != null ? `Saldo restante: ${formatMoney(res.saldo_novo)}` : '';
@@ -1017,6 +745,29 @@ async function renderJogo(container) {
     else _estilizarBotoesResultado('derrota', 'padrao');
   }
 
+  function _estilizarBotoesResultado(tipo, tema) {
+    const btnJogar = document.querySelector('button[onclick="jogarNovamente()"]');
+    if (!btnJogar) return;
+
+    if (tema === 'copa') {
+      btnJogar.style.background = 'linear-gradient(135deg,#009C3B,#00782D)';
+      btnJogar.style.boxShadow = '0 4px 20px rgba(0,156,59,.4)';
+    } else if (tema === 'pascoa') {
+      btnJogar.style.background = 'linear-gradient(135deg,#059669,#10b981,#34d399)';
+      btnJogar.style.boxShadow = '0 4px 20px rgba(16,185,129,.4)';
+    } else {
+      btnJogar.style.background = 'linear-gradient(135deg,#FF6B9D,#c026d3)';
+      btnJogar.style.boxShadow = '0 4px 20px rgba(255,107,157,.4)';
+    }
+  }
+
+  // ── Música Copa ───────────────────────────────────────────────────────────
+  function _pararMusicaCopa() {
+    try {
+      const gIframe = document.getElementById('game-iframe');
+      gIframe?.contentWindow?._gameMusic?.stopCopaTheme?.();
+    } catch (_) {}
+  }
 
   // ── Ações dos botões de resultado ─────────────────────────────────────────
   function jogarNovamente() {
