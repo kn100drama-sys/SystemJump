@@ -1,6 +1,3 @@
-const cors = require("cors");
-const { app, allowedOrigins } = require("../backend/server");
-
 // ─── Painel Page — mobile-first redesign ──────────────────────────────────────
 function renderPainel(el) {
   const user    = API.getUser() || {};
