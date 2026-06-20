@@ -1,7 +1,22 @@
 // ─── Config pública cacheada ──────────────────────────────────────────────────
-const r = await fetch(
-  'https://beckhend-bk.onrender.com/api/public/config?_=' + Date.now()
-);
+let _publicCfgCache = null;
+
+async function getPublicConfig(force) {
+  if (_publicCfgCache && !force) return _publicCfgCache;
+
+  try {
+    const r = await fetch(
+      'https://beckhend-bk.onrender.com/api/public/config?_=' + Date.now()
+    );
+
+    _publicCfgCache = await r.json();
+  } catch (e) {
+    console.error('Erro ao carregar config pública:', e);
+    _publicCfgCache = _publicCfgCache || {};
+  }
+
+  return _publicCfgCache;
+}
 
 // Invalida cache quando admin salva configs (chamado opcionalmente)
 window.invalidatePublicCfgCache = function() { _publicCfgCache = null; };
