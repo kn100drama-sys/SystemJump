@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programa de Parceiros - Bk Jogue</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a0b2e 0%, #3d1b5e 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .bk-pink { color: #ff69b4; }
+        .bg-bk-pink { background-color: #ff69b4; }
+        .bg-bk-purple { background-color: #2d144d; }
+        .border-bk-pink { border-color: #ff69b4; }
+        .btn-gradient {
+            background: linear-gradient(90deg, #ff69b4 0%, #ff1493 100%);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3);
+        }
+        .card-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+        .step-number {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ff69b4;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <header class="max-w-4xl mx-auto flex justify-between items-center mb-12">
+        <div class="text-2xl font-extrabold tracking-tighter">
+            Bk <span class="bk-pink">Jogue</span>
+        </div>
+        <a href="https://bk-jogue.top/#painel" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-sm font-semibold transition">
+            Voltar ao Site
+        </a>
+    </header>
+
+    <main class="max-w-4xl mx-auto">
+        <!-- Hero Section -->
+        <section class="text-center mb-16">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+                Programa de <span class="bk-pink">Parceiros</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Transforme sua influência em lucro real. Indique amigos para a Bk Jogue e receba comissões exclusivas por cada novo jogador!
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="https://bk-jogue.top/#painel" class="btn-gradient px-8 py-4 rounded-full text-lg font-bold text-center">
+                    QUERO SER UM AFILIADO
+                </a>
+                <a href="https://www.instagram.com/bkagencia__" target="_blank" class="bg-white/10 hover:bg-white/20 px-8 py-4 rounded-full text-lg font-bold flex items-center justify-center gap-2">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    Suporte Instagram
+                </a>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <section class="grid md:grid-cols-3 gap-6 mb-16">
+            <div class="card-glass p-6 text-center">
+                <div class="text-4xl mb-4">💰</div>
+                <h3 class="text-xl font-bold mb-2">Lucro Imediato</h3>
+                <p class="text-gray-400">Receba uma comissão única por cada pessoa que entrar e jogar através do seu link.</p>
+            </div>
+            <div class="card-glass p-6 text-center">
+                <div class="text-4xl mb-4">⚡</div>
+                <h3 class="text-xl font-bold mb-2">Saques Rápidos</h3>
+                <p class="text-gray-400">Suas comissões caem direto no seu saldo e você pode sacar via PIX a qualquer momento.</p>
+            </div>
+            <div class="card-glass p-6 text-center">
+                <div class="text-4xl mb-4">📈</div>
+                <h3 class="text-xl font-bold mb-2">Sem Limites</h3>
+                <p class="text-gray-400">Quanto mais você divulgar, mais você ganha. Não existe teto para os seus lucros.</p>
+            </div>
+        </section>
+
+        <!-- How to Start Section -->
+        <section class="card-glass p-8 md:p-12 mb-16">
+            <h2 class="text-3xl font-extrabold mb-10 text-center">Como começar a <span class="bk-pink">Ganhar?</span></h2>
+            
+            <div class="space-y-8">
+                <div class="flex items-start">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">Acesse a Plataforma</h4>
+                        <p class="text-gray-400">Clique no botão abaixo para ir ao site oficial e faça o login na sua conta.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">Vá em "Indicar"</h4>
+                        <p class="text-gray-400">Dentro do painel, procure pelo botão de indicação no menu principal.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">Pegue seu Link Exclusivo</h4>
+                        <p class="text-gray-400">Lá você encontrará seu link personalizado. Copie e comece a divulgar!</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="step-number">4</div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-1">Receba sua Comissão</h4>
+                        <p class="text-gray-400">Quem entrar pelo seu link e começar a jogar gera uma comissão automática para você.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <a href="https://bk-jogue.top/#painel" class="btn-gradient inline-block px-12 py-4 rounded-full text-xl font-black uppercase tracking-wider">
+                    Ir para o Site Agora
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-500 text-sm pb-8">
+            <p>© 2026 Bk Jogue. Todos os direitos reservados.</p>
+            <p class="mt-2">Divulgue com responsabilidade. Proibido para menores de 18 anos.</p>
+        </footer>
+    </main>
+</body>
+</html>
