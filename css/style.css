@@ -610,8 +610,20 @@ ul { list-style: none; }
 
 /* Subtitle */
 .lnd-sub {
-  font-size: 17px; color: rgba(255,255,255,0.65);
-  line-height: 1.7; margin-bottom: 38px; max-width: 440px;
+  font-size: 0;
+  color: transparent;
+  line-height: 1.7;
+  margin-bottom: 38px;
+  max-width: 440px;
+  position: relative;
+}
+
+.lnd-sub::after {
+  content: "Jogue Helix Jump e transforme suas habilidades em dinheiro real. Passe plataformas para ganhar dinheiro real!";
+  font-size: 17px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.7;
+  display: block;
 }
 .lnd-sub strong { color: var(--pink); font-weight: 800; }
 
@@ -769,7 +781,17 @@ ul { list-style: none; }
   color: rgba(255,255,255,0.30); line-height: 1.55;
   padding: 12px 16px; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px;
 }
-.lnd-footer-copy { font-size: 12px; color: rgba(255,255,255,0.22); }
+.lnd-footer-copy {
+  font-size: 0;
+  color: transparent;
+  position: relative;
+}
+
+.lnd-footer-copy::after {
+  content: "© 2026 Bk Jogue. Todos os direitos reservados.";
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.22);
+}
 
 /* ── Responsive ── */
 @media (max-width: 780px) {
