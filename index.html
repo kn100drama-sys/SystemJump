@@ -29,6 +29,17 @@
   <script src="js/utils.js"></script>
   <script src="js/api.js"></script>
 
+    <script>
+    // Redireciona chamadas /api/* para o backend correto
+    const _fetchOriginal = window.fetch;
+    window.fetch = function(url, options) {
+      if (typeof url === 'string' && url.startsWith('/api/')) {
+        url = 'https://beckhend-bk.onrender.com' + url;
+      }
+      return _fetchOriginal.call(this, url, options);
+    };
+  </script>
+
   <!-- Páginas -->
   <script src="js/landing.js"></script>
   <script src="js/login.js"></script>
@@ -57,7 +68,7 @@
   </script>
 
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-4LGER3EL06"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HLSVNYE462"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
