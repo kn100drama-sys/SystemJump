@@ -916,6 +916,13 @@ function enterDashboard(user) {
   loadDashboard();
 }
 
+//////  VAI PRA PAGINA DE USUARIOS PAINEL ADMIN
+document.querySelectorAll('[data-view="usuarios"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    window.location.href = 'env-users.html';
+  });
+});
+
 document.querySelectorAll(".theme-menu button").forEach(btn => {
   btn.addEventListener("click", async () => {
     const theme = btn.dataset.theme;
@@ -942,7 +949,6 @@ async function marcarTemaAtual() {
 }
 
 marcarTemaAtual();
-
 // ═══════════════════════════════════════════
 // DASHBOARD DATA
 // ═══════════════════════════════════════════
