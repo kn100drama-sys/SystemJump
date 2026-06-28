@@ -110,6 +110,27 @@
     flex-direction: column;
     gap: 10px;
   }
+
+  .btn-delete{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:7px 14px;
+    background:rgba(239,68,68,.12);
+    border:1px solid rgba(239,68,68,.35);
+    border-radius:8px;
+    color:#ef4444;
+    font-size:12px;
+    font-weight:600;
+    transition:.2s;
+    cursor:pointer;
+}
+
+  .btn-delete:hover{
+      background:rgba(239,68,68,.22);
+}
+
   .platform-card {
     padding: 14px;
     border-radius: var(--radius-sm);
@@ -252,42 +273,71 @@
   }
   .btn-filter:hover { background: rgba(255,255,255,.05); color: var(--text-0); }
 
-  /* ── TABLE (desktop) ── */
-  .table-wrap {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  thead tr {
-    border-bottom: 1px solid var(--panel-border);
-  }
-  th {
-    padding: 13px 16px;
-    text-align: left;
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: .05em;
-    color: var(--text-2);
-    white-space: nowrap;
-  }
-  td { padding: 0; }
-  .user-row {
-    display: contents;
-  }
-  .user-row > td {
-    padding: 14px 16px;
-    vertical-align: middle;
-    border-bottom: 1px solid rgba(42,36,64,.6);
-  }
-  .user-row:last-child > td { border-bottom: none; }
-  .user-row:hover > td { background: rgba(255,255,255,.025); }
+ /* ── TABLE (cards melhorado) ── */
+.table-wrap {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
+/* remove header */
+thead {
+  display: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  font-size: 13px;
+}
+
+/* CARD */
+.user-row {
+  display: block;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: .2s;
+}
+
+.user-row:hover {
+  background: rgba(255,255,255,.04);
+}
+
+/* LINHAS INTERNAS MAIS NATURAIS */
+.user-row > td {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(42,36,64,.4);
+}
+
+/* remove última borda */
+.user-row > td:last-child {
+  border-bottom: none;
+}
+
+/* deixa label + valor mais organizados (caso use data-label depois) */
+.user-row > td::before {
+  content: attr(data-label);
+  font-size: 11px;
+  color: var(--text-2);
+  letter-spacing: .03em;
+}
+
+/* valor principal mais destacado */
+.user-row > td {
+  font-size: 13px;
+  color: var(--text);
+}
   /* user cell */
   .u-info { display: flex; align-items: center; gap: 10px; }
   .u-avatar {
@@ -741,7 +791,7 @@
     </div>
 
     <div class="nav-section">Principal</div>
-    <div class="nav-item" onclick="location.href='javascript:void(0)'">
+    <div class="nav-item" onclick="window.location.href='distingue'">
       <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span> Dashboard
     </div>
 
@@ -904,7 +954,7 @@
 
 <!-- BOTTOM NAV MOBILE -->
 <nav class="bottom-nav">
-    <button class="bn-item" onclick="window.location.href='env-exemplo.html'">
+    <button class="bn-item" onclick="window.location.href='distingue'">
     <span class="bn-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>Dashboard
   </button>
   <button class="bn-item active">
@@ -1142,6 +1192,22 @@ async function loadSaldo() {
   } catch {}
 }
 
+async function deleteUser(id, nome) {
+    if (!confirm(`Deseja realmente excluir "${nome}"?`)) return;
+
+    try {
+        await apiReq(`/api/admin/users/${id}`, {
+            method: 'DELETE'
+        });
+
+        showToast('Usuário excluído com sucesso!');
+        loadUsers();
+
+    } catch (err) {
+        showToast(err.message || 'Erro ao excluir usuário', 'error');
+    }
+}
+
 function setAdminInfo() {
   const userId = getUserId();
   const me = allUsers.find(u => u.id === userId) || {};
@@ -1258,9 +1324,10 @@ function renderTable() {
         </div>
       </td>
       <td>
-        <div class="actions-cell">
+                <div class="actions-cell">
           <button class="btn-edit" onclick="openEdit(${u.id})">✏️ Editar</button>
           <button class="btn-view" onclick="openProfile(${u.id})">👁 Ver Perfil</button>
+          <button class="btn-delete" onclick="deleteUser(${u.id}, '${esc(u.nome)}')">🗑 Excluir</button>
         </div>
       </td>
     </tr>`;
@@ -1331,6 +1398,7 @@ function renderCards() {
       <div class="uc-actions">
         <button class="btn-edit" onclick="openEdit(${u.id})">✏️ Editar</button>
         <button class="btn-view" onclick="openProfile(${u.id})">👁 Ver Perfil</button>
+        <button class="btn-delete" onclick="deleteUser(${u.id}, '${esc(u.nome)}')">🗑 Excluir</button>
       </div>
     </div>`;
   }).join('');
@@ -1560,7 +1628,7 @@ function esc(str) {
 
 // ----- VOLTA PRA PAGINA DE ADMIN ------
 function goHome() {
-  window.location.href = 'env-exemplo.html';
+  window.location.href = 'distingue';
 }
 
 // ── INIT ──
