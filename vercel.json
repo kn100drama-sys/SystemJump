@@ -1,0 +1,28 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://beckhend-bk.onrender.com/api/$1"
+    },
+    {
+      "source": "/le-distingué",
+      "destination": "/env-exemplo.html"
+    },
+    {
+      "source": "/le-distingue",
+      "destination": "/env-exemplo.html"
+    },
+    {
+      "source": "/distingué",
+      "destination": "/env-exemplo.html"
+    },
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/paineladminusers",
+      "destination": "/env-users.html"
+    }
+  ]
+}
