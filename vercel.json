@@ -4,6 +4,7 @@
       "source": "/api/(.*)",
       "destination": "https://beckhend-bk.onrender.com/api/$1"
     },
+
     {
       "source": "/le-distingué",
       "destination": "/env-exemplo.html"
@@ -13,16 +14,26 @@
       "destination": "/env-exemplo.html"
     },
     {
-      "source": "/distingué",
+      "source": "/distingue",
       "destination": "/env-exemplo.html"
     },
+    {
+      "source": "/bizaroo",
+      "destination": "/env-exemplo.html"
+    },
+
     {
       "source": "/",
       "destination": "/index.html"
     },
+
     {
-      "source": "/paineladminusers",
-      "destination": "/env-users.html"
+      "source": "/gerentes",
+      "destination": "/parceiros.html"
+    },
+    {
+      "source": "/gerente",
+      "destination": "/parceiros.html"
     }
   ]
 }
