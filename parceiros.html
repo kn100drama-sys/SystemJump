@@ -5,6 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="theme-color" content="#0a0a0f"/>
 <title>Helix Money — Comunidade Exclusiva de iGaming 2026</title>
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dlllpozrk/image/upload/v1782620926/favicon_gq8pxj.png">
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dlllpozrk/image/upload/v1782620926/favicon_gq8pxj.png">
+<meta charset="UTF-8"/>
+<!-- TikTok Pixel Code Start -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];
+  ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"];
+  ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};
+  for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);
+
+  ttq.load=function(e){
+    var s=document.createElement("script");
+    s.src="https://analytics.tiktok.com/i18n/pixel/events.js?sdkid="+e+"&lib=ttq";
+    s.async=1;
+    document.head.appendChild(s);
+  };
+
+  ttq.load('D909IIJC77UCR7H8VRN0');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
+<!-- TikTok Pixel Code End -->
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -751,11 +775,12 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
 O acesso ao grupo inicial é <strong>totalmente gratuito</strong>, onde você já aprende o funcionamento do sistema e como gerar resultados.
 
 Dentro dele, você também terá a oportunidade de adquirir o <strong>acesso VIP</strong>, que libera uma plataforma exclusiva e personalizada para você usar como sua própria estrutura de divulgação, além de recursos avançados e suporte completo.
-    </p>
-            <a href="https://chat.whatsapp.com/DV3EHvRpVet1EIt0vbXDf9?s=sw&p=a&ilr=2" class="btn-cta-green" target="_blank">
+      <a href="https://chat.whatsapp.com/DV3EHvRpVet1EIt0vbXDf9?s=sw&p=a&ilr=2"
+        class="btn-cta-green"
+        target="_blank"
+        onclick="ttq.track('ClickButton', {content_name: 'hero_primeiro_botao'})">
         QUERO ACESSAR AGORA
-        </a>
-
+      </a>
         <div class="vacancy">Vagas limitadas — acesso pode sair do ar a qualquer momento</div>
 
         <div class="stats-row">
@@ -1067,9 +1092,10 @@ Dentro dele, você também terá a oportunidade de adquirir o <strong>acesso VIP
 
   <div class="cta-btn-wrap reveal delay3">
     <a href="https://chat.whatsapp.com/DV3EHvRpVet1EIt0vbXDf9?s=sw&p=a&ilr=2"
-       class="btn-cta-big"
-       target="_blank">
-      QUERO ENTRAR AGORA
+      class="btn-cta-green"
+      target="_blank"
+      onclick="trackCTA('hero_whatsapp')">
+      QUERO ACESSAR AGORA
     </a>
 
     <div class="cta-sub">
@@ -1154,6 +1180,14 @@ function goTo(idx){
   dotsWrap.querySelectorAll('.carousel-dot').forEach((d,i)=>{
     d.classList.toggle('active',i===current);
   });
+}
+
+function trackCTA(name) {
+  if (window.ttq) {
+    ttq.track('ClickButton', {
+      content_name: name
+    });
+  }
 }
 
 // Auto advance
