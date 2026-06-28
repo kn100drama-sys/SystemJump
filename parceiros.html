@@ -194,6 +194,19 @@ body{
 }
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
+.proof-img {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  box-shadow: 0 20px 50px rgba(0,0,0,.35);
+  transition: .3s ease;
+}
+
+.proof-slide:hover .proof-img {
+  transform: scale(1.03);
+}
 /* ── HERO ── */
 .hero{
   min-height:100vh;padding-top:60px;
@@ -731,11 +744,13 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
   <div class="hero-left reveal">
     <div class="badge-live">
       <div class="badge-live-dot"></div>
-      LIVE — TENDÊNCIA 2026
+      TENDÊNCIA 2026
     </div>
-    <h1 class="hero-h1">A nova onda<br>que está<br><span class="green">gerando dinheiro</span><br>em 2026</h1>
+    <h1 class="hero-h1">A nova onda<br>que está<br><span class="green">gerando oportunidades</span><br>em 2026</h1>
     <p class="hero-desc">
-      Por apenas <strong>R$ 197</strong>, você recebe <strong>a plataforma do jogo da bolinha para divulgar como sua</strong>. Aprenda a captar clientes via influenciadores, fechando na comissão — <strong>sem gastar nada além da entrada</strong>.
+O acesso ao grupo inicial é <strong>totalmente gratuito</strong>, onde você já aprende o funcionamento do sistema e como gerar resultados.
+
+Dentro dele, você também terá a oportunidade de adquirir o <strong>acesso VIP</strong>, que libera uma plataforma exclusiva e personalizada para você usar como sua própria estrutura de divulgação, além de recursos avançados e suporte completo.
     </p>
             <a href="https://chat.whatsapp.com/DV3EHvRpVet1EIt0vbXDf9?s=sw&p=a&ilr=2" class="btn-cta-green" target="_blank">
         QUERO ACESSAR AGORA
@@ -794,7 +809,13 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
     <div class="prob-card reveal delay1">
       <div class="prob-icon dark-bg">🌙</div>
       <h3>A maioria ignora</h3>
-      <p>Enquanto uns gastam milhares em tráfego pago e cursos caros, quem entra no Helix investe <strong>apenas R$ 197 uma vez</strong> e capta clientes através de influenciadores <strong>sem custo extra</strong>.</p>
+      <p>
+        Enquanto muitos investem pesado em tráfego pago e cursos caros, no Helix você acessa um sistema completo de captação de clientes via influenciadores — sem mensalidades e sem custos adicionais para iniciar.
+        </p>
+
+        <p>
+        <strong>Atenção:</strong> as vagas são limitadas para garantir qualidade no suporte. O acesso pode ser <strong>encerrado a qualquer momento</strong>, sem aviso prévio.
+        </p>
     </div>
     <div class="prob-card reveal delay2">
       <div class="prob-icon green-bg">🚀</div>
@@ -811,7 +832,9 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
     <div class="reveal">
       <div class="eyebrow cyan">A SOLUÇÃO</div>
       <h2>Sua entrada para<br>a <span class="accent-blue">próxima onda</span></h2>
-      <p class="section-desc">Com R$ 197 você recebe o sistema completo + o método para captar clientes sem gastar mais nada.</p>
+      <p class="section-desc">
+        Acesso ao sistema completo + método de captação de clientes via influenciadores, com tudo pronto para começar sem custos adicionais.
+        </p>
       <div class="solution-list">
         <div class="sol-item">
           <div class="sol-icon-box g">🎮</div>
@@ -830,7 +853,7 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
         <div class="sol-item">
           <div class="sol-icon-box b">⚡</div>
           <div>
-            <h3>Investimento único de R$ 197</h3>
+            <h3>Investimento único.</h3>
             <p>Sem mensalidade, sem tráfego pago, sem custo com influenciador. Pague uma vez e comece a faturar.</p>
           </div>
         </div>
@@ -870,14 +893,14 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
     <div class="benefit-card reveal delay3">
       <div class="benefit-icon">💰</div>
       <div class="benefit-text">
-        <h3>Zero custo além dos R$ 197</h3>
+        <h3>Zero custo.</h3>
         <p>Sem tráfego pago, sem mensalidade, sem estoque. Seu único investimento é a entrada.</p>
       </div>
     </div>
     <div class="benefit-card reveal delay4">
       <div class="benefit-icon">📚</div>
       <div class="benefit-text">
-        <h3>Curso + comunidade + lives</h3>
+        <h3>Treinamento completo + comunidade + aulas práticas para gerar resultados em marketing</h3>
         <p>Aulas do zero ao avançado, grupo exclusivo e lives semanais com estratégias atualizadas.</p>
       </div>
     </div>
@@ -888,7 +911,7 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
 <section class="results-section">
   <div class="results-header reveal">
     <div class="eyebrow green" style="justify-content:center;display:flex">RESULTADOS REAIS</div>
-    <h2>Quem entrou primeiro <span class="accent-green">já entendeu</span></h2>
+    <h2>Quem entrou primeiro <span class="accent-green">já começou a ter resultados</span></h2>
     <p>Prints reais da comunidade. Toque para ampliar.</p>
   </div>
   <div class="results-stats reveal delay1">
@@ -898,76 +921,83 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
   </div>
 
   <div class="carousel-wrap reveal delay2">
-    <div class="carousel-track" id="track">
-      <!-- 8 proof cards -->
-      <div class="proof-slide">
-        <div class="proof-screen">
-          <div class="fake-msg" style="color:var(--muted)">Grupo Helix Money 💰</div>
-          <div class="fake-msg fake-msg-green">+R$ 635,00 💸</div>
-          <div class="fake-msg" style="color:var(--muted);font-size:8px">Método funcionou demais</div>
-        </div>
-        <div class="proof-name-bar"><span class="proof-name">Victor</span><span class="proof-amount">+R$ 635,00</span></div>
+  <div class="carousel-track" id="track">
+
+    <div class="proof-slide">
+      <img src="https://helix-glow-access.lovable.app/assets/depoimento-8-BuHprv1D.png" class="proof-img">
+      <div class="proof-name-bar">
+        <span class="proof-name">Victor</span>
+        <span class="proof-amount">+R$ 635,00</span>
       </div>
-      <div class="proof-slide">
-        <div class="proof-screen">
-          <div class="fake-msg" style="color:var(--muted)">Grupo Helix Money 💰</div>
-          <div class="fake-msg fake-msg-green">+R$ 220,00 ✅</div>
-          <div class="fake-msg" style="color:var(--muted);font-size:8px">Influenciador fechou ontem</div>
-        </div>
-        <div class="proof-name-bar"><span class="proof-name">Lucas G.</span><span class="proof-amount">+R$ 220,00</span></div>
+    </div>
+
+    <div class="proof-slide">
+      <img src="https://helix-glow-access.lovable.app/assets/depoimento-7-DG5UESeO.png" class="proof-img">
+      <div class="proof-name-bar">
+        <span class="proof-name">Lucas G.</span>
+        <span class="proof-amount">+R$ 220,00</span>
       </div>
-      <div class="proof-slide">
-        <div class="proof-screen">
-          <div class="fake-msg" style="color:var(--muted)">Grupo Helix Money 💰</div>
-          <div class="fake-msg fake-msg-green">+R$ 90,00 🚀</div>
-          <div class="fake-msg" style="color:var(--muted);font-size:8px">Primeiro dia, já faturei</div>
-        </div>
-        <div class="proof-name-bar"><span class="proof-name">Kaique</span><span class="proof-amount">+R$ 90,00</span></div>
+    </div>
+
+    <div class="proof-slide">
+      <img src="https://helix-glow-access.lovable.app/assets/depoimento-6-Cmw5MS_E.png" class="proof-img">
+      <div class="proof-name-bar">
+        <span class="proof-name">Felipe</span>
+        <span class="proof-amount">+R$ 90,00</span>
       </div>
-      <div class="proof-slide">
-        <div class="proof-screen">
-          <div class="fake-msg" style="color:var(--muted)">Grupo Helix Money 💰</div>
-          <div class="fake-msg fake-msg-green">+R$ 1.463,00 🔥</div>
-          <div class="fake-msg" style="color:var(--muted);font-size:8px">Semana explosiva</div>
-        </div>
-        <div class="proof-name-bar"><span class="proof-name">Almeida</span><span class="proof-amount">+R$ 1.463,00</span></div>
+    </div>
+
+    <div class="proof-slide">
+      <img src="https://helix-glow-access.lovable.app/assets/depoimento-9-DoyWrVQR.png" class="proof-img">
+      <div class="proof-name-bar">
+        <span class="proof-name">Almeida</span>
+        <span class="proof-amount">+R$ 1.463,00</span>
       </div>
-      <div class="proof-slide">
-        <div class="proof-screen">
-          <div class="fake-msg" style="color:var(--muted)">Grupo Helix Money 💰</div>
-          <div class="fake-msg fake-msg-green">+R$ 320,00 💎</div>
-          <div class="fake-msg" style="color:var(--muted);font-size:8px">Sem gastar nada extra</div>
-        </div>
-        <div class="proof-name-bar"><span class="proof-name">Aluno</span><span class="proof-amount">+R$ 320,00</span></div>
+    </div>
+
+    <div class="proof-slide">
+      <img src="https://helix-glow-access.lovable.app/assets/depoimento-1-CSADWWaO.png" class="proof-img">
+      <div class="proof-name-bar">
+        <span class="proof-name">Kaique</span>
+        <span class="proof-amount">+R$ 320,00</span>
       </div>
-      <div class="proof-slide">
-        <div class="proof-screen">
-          <div class="fake-msg" style="color:var(--muted)">Grupo Helix Money 💰</div>
-          <div class="fake-msg fake-msg-green">+R$ 840,00 ⚡</div>
-          <div class="fake-msg" style="color:var(--muted);font-size:8px">3 influenciadores fechados</div>
-        </div>
-        <div class="proof-name-bar"><span class="proof-name">Fernanda</span><span class="proof-amount">+R$ 840,00</span></div>
+    </div>
+
+    <div class="proof-slide">
+      <img src="https://helix-glow-access.lovable.app/assets/depoimento-5-CvVw2sqE.png" class="proof-img">
+      <div class="proof-name-bar">
+        <span class="proof-name">Fernanda</span>
+        <span class="proof-amount">+R$ 840,00</span>
       </div>
-      <div class="proof-slide">
-        <div class="proof-screen">
-          <div class="fake-msg" style="color:var(--muted)">Grupo Helix Money 💰</div>
-          <div class="fake-msg fake-msg-green">+R$ 155,00 ✅</div>
-          <div class="fake-msg" style="color:var(--muted);font-size:8px">Método simples demais</div>
-        </div>
-        <div class="proof-name-bar"><span class="proof-name">Rafael</span><span class="proof-amount">+R$ 155,00</span></div>
+    </div>
+
+    <div class="proof-slide">
+      <img src="https://helix-glow-access.lovable.app/assets/depoimento-2-ZHRJGmKi.png" class="proof-img">
+      <div class="proof-name-bar">
+        <span class="proof-name">Rafael</span>
+        <span class="proof-amount">+R$ 155,00</span>
       </div>
-      <div class="proof-slide">
-        <div class="proof-screen">
-          <div class="fake-msg" style="color:var(--muted)">Grupo Helix Money 💰</div>
-          <div class="fake-msg fake-msg-green">+R$ 2.100,00 🏆</div>
-          <div class="fake-msg" style="color:var(--muted);font-size:8px">Mês incrível!</div>
-        </div>
-        <div class="proof-name-bar"><span class="proof-name">Mariana</span><span class="proof-amount">+R$ 2.100,00</span></div>
+    </div>
+
+    <div class="proof-slide">
+      <img src="https://helix-glow-access.lovable.app/assets/depoimento-5-CvVw2sqE.png" class="proof-img">
+      <div class="proof-name-bar">
+        <span class="proof-name">Mariana</span>
+        <span class="proof-amount">+R$ 2.100,00</span>
+      </div>
+    </div>
+
+    <div class="proof-slide">
+      <img src="https://helix-glow-access.lovable.app/assets/depoimento-3-Cpxsn_mF.png" class="proof-img">
+      <div class="proof-name-bar">
+        <span class="proof-name">Ariel</span>
+        <span class="proof-amount">+R$ 1.260,00</span>
       </div>
     </div>
   </div>
+</div>
   <div class="carousel-controls" id="dots"></div>
-  <p class="proof-disclaimer">🎯 Prints reais • Toque para ampliar • Resultados podem variar</p>
+  <p class="proof-disclaimer">🎯 Prints reais • Resultados podem variar</p>
 </section>
 
 <!-- COMO FUNCIONA -->
@@ -981,7 +1011,7 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
     <div class="step-row left reveal delay1" style="display:grid;grid-template-columns:1fr 32px 1fr;align-items:center">
       <div class="step-card">
         <div class="step-card-icon">🔑</div>
-        <h3>Garanta seu acesso por R$ 197</h3>
+        <h3>Garanta seu acesso.</h3>
         <p>Pagamento único. Você recebe a plataforma do jogo da bolinha pronta para divulgar.</p>
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;height:100%;position:relative">
@@ -1022,22 +1052,40 @@ footer p{color:var(--muted2);font-size:11px;line-height:1.9}
 
 <!-- CTA FINAL -->
 <section class="cta-section" id="cta">
-  <div class="badge-ultimas reveal">🔥 ÚLTIMAS VAGAS DISPONÍVEIS</div>
-  <h2 class="reveal delay1">Se você perdeu<br>as anteriores,<br><span class="accent-green">essa é a próxima.</span></h2>
-  <p class="reveal delay2">A janela de oportunidade está se fechando. Cada minuto que passa é um minuto que você poderia estar dentro da comunidade lucrando.</p>
+
+  <div class="badge-ultimas reveal">🔥 ACESSO GRATUITO POR TEMPO LIMITADO</div>
+
+  <h2 class="reveal delay1">
+    Você ainda pode entrar no grupo gratuito<br>
+    <span class="accent-green">antes que o acesso seja encerrado.</span>
+  </h2>
+
+  <p class="reveal delay2">
+    As entradas são liberadas por tempo limitado para manter a qualidade da comunidade.  
+    Quem entra agora já começa com vantagem e acompanha tudo desde o início.
+  </p>
+
   <div class="cta-btn-wrap reveal delay3">
-    <a href="https://chat.whatsapp.com/DV3EHvRpVet1EIt0vbXDf9?s=sw&p=a&ilr=2" class="btn-cta-big" target="_blank">
-    QUERO ENTRAR AGORA — R$ 197
+    <a href="https://chat.whatsapp.com/DV3EHvRpVet1EIt0vbXDf9?s=sw&p=a&ilr=2"
+       class="btn-cta-big"
+       target="_blank">
+      QUERO ENTRAR AGORA
     </a>
 
     <div class="cta-sub">
-    Acesso pode ser encerrado a qualquer momento sem aviso prévio
+      O acesso pode ser encerrado a qualquer momento, sem aviso prévio
     </div>
+  </div>
+
 </section>
+
 
 <!-- FOOTER -->
 <footer>
-  <p>© 2026 Helix Money Community. Todos os direitos reservados. Este produto não garante obtenção de resultados. Quaisquer referências a resultados são ilustrativas.</p>
+  <p>
+    © 2026 Helix Money Community. Todos os direitos reservados.  
+    O acesso ao método e à comunidade é garantido após a liberação, mas os resultados podem variar conforme a aplicação individual.
+  </p>
 </footer>
 
 <script>
