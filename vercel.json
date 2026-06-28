@@ -6,6 +6,11 @@
     },
 
     {
+      "source": "/users-admin-config",
+      "destination": "/env-users.html"
+    },
+
+    {
       "source": "/le-distingué",
       "destination": "/env-exemplo.html"
     },
