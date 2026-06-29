@@ -74,6 +74,139 @@
     font-size:14px;
   }
 
+
+  /* ===== MODAL OVERLAY ===== */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 8, 18, 0.65);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  animation: fadeIn .2s ease-out;
+}
+
+/* ===== BOX PRINCIPAL ===== */
+.modal-box {
+  width: 380px;
+  max-width: 92vw;
+  padding: 22px 20px;
+  border-radius: 18px;
+
+  background: linear-gradient(135deg, rgba(22,18,36,.92), rgba(18,14,30,.85));
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  box-shadow: 0 20px 60px rgba(0,0,0,.55);
+
+  color: #fff;
+
+  transform: translateY(10px) scale(.98);
+  animation: popIn .25s ease-out forwards;
+}
+
+/* ===== TÍTULO ===== */
+.modal-box h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.modal-box p {
+  font-size: 13px;
+  color: #b6b0c9;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+/* ===== BOTÕES ===== */
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 12px 10px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: all .2s ease;
+  letter-spacing: -0.01em;
+}
+
+/* verde premium */
+.btn-green {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(34,197,94,.25);
+}
+
+.btn-green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(34,197,94,.35);
+}
+
+/* vermelho premium */
+.btn-red {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(239,68,68,.25);
+}
+
+.btn-red:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(239,68,68,.35);
+}
+
+/* ===== BOTÃO FECHAR ===== */
+#closeTaxaModal {
+  margin-top: 14px;
+  width: 100%;
+
+  padding: 10px;
+  border-radius: 12px;
+
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+  color: #b6b0c9;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+#closeTaxaModal:hover {
+  background: rgba(255,255,255,.10);
+  color: #fff;
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
   .nav-section{
     font-size:10.5px;
     font-weight:700;
@@ -582,11 +715,9 @@
   <div class="mh-side">
     <button class="mh-burger" id="mhBurger" aria-label="Menu">☰</button>
 
-    <div class="theme-menu" id="themeMenu">
-      <button data-theme="padrao">⚪ Padrão</button>
-      <button data-theme="copa">🏆 Copa</button>
-      <button data-theme="pascoa">🐰 Páscoa</button>
-    </div>
+  <div class="theme-menu" id="themeMenu">
+    <button id="openTaxaConfig">⚙️ Taxa de saque</button>
+  </div>
   </div>
     <div class="mh-brand"><span class="bk">BK</span><span class="pro">ADMIN</span></div>
     <div class="mh-side right">
@@ -775,6 +906,22 @@
     </main>
   </div>
 
+
+  <div id="taxaModal" class="modal">
+  <div class="modal-box">
+    <h3>Configuração de Taxa de Saque</h3>
+
+    <p>Escolha se deseja cobrar taxa nos saques:</p>
+
+    <div class="modal-actions">
+      <button data-theme="true" class="btn-green">🟢 Cobrar taxa</button>
+      <button data-theme="false" class="btn-red">🔴 Não cobrar</button>
+    </div>
+
+    <button id="closeTaxaModal">Fechar</button>
+  </div>
+</div>
+
   <!-- Bottom nav mobile (visível apenas em telas pequenas) -->
   <nav class="bottom-nav">
     <button class="bn-item active" data-view="dashboard"><span class="bn-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>Dashboard</button>
@@ -812,13 +959,53 @@ function showToast(msg, type = 'success') {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-                                        const burger = document.getElementById("mhBurger");
-                                        const menu = document.getElementById("themeMenu");
+const burger = document.getElementById("mhBurger");
+const menu = document.getElementById("themeMenu");
 
-                                        // abre/fecha menu
-                                        burger.addEventListener("click", () => {
-                                          menu.style.display = menu.style.display === "flex" ? "none" : "flex";
-                                        });
+// abre/fecha menu
+burger.addEventListener("click", () => {
+menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+});
+
+const modal = document.getElementById("taxaModal");
+
+document.getElementById("openTaxaConfig").addEventListener("click", () => {
+  modal.style.display = "flex";
+});
+
+document.getElementById("closeTaxaModal").addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+document.querySelectorAll(".modal-actions button").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    try {
+      const cobrarTaxa = btn.dataset.theme;
+
+      const res = await fetch(`${API_BASE}/api/admin/theme`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ theme: cobrarTaxa })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error);
+
+      modal.style.display = "none";
+
+      showToast(
+        cobrarTaxa === "true"
+          ? "Taxa de saque ativada"
+          : "Taxa de saque desativada",
+        "success"
+      );
+
+    } catch (err) {
+      showToast(err.message, "error");
+    }
+  });
+});
 
 async function api(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -923,32 +1110,7 @@ document.querySelectorAll('[data-view="usuarios"]').forEach(btn => {
   });
 });
 
-document.querySelectorAll(".theme-menu button").forEach(btn => {
-  btn.addEventListener("click", async () => {
-    const theme = btn.dataset.theme;
 
-    await fetch("/api/admin/theme", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ theme })
-    });
-
-    menu.style.display = "none";
-
-    alert("Tema alterado para: " + theme);
-  });
-});
-
-async function marcarTemaAtual() {
-  const res = await fetch("/api/public/config");
-  const data = await res.json();
-
-  document.querySelectorAll(".theme-menu button").forEach(btn => {
-    btn.style.opacity = btn.dataset.theme === data.theme ? "1" : "0.5";
-  });
-}
-
-marcarTemaAtual();
 // ═══════════════════════════════════════════
 // DASHBOARD DATA
 // ═══════════════════════════════════════════
