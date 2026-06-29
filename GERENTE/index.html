@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<title>Gerente Afiliado</title>
+<meta name="theme-color" content="#08080a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Gerente"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+<style>
+/* ══════════════════════════════════════════
+   RESET + VARS
+══════════════════════════════════════════ */
+:root{
+  --bg:       #08080a;
+  --bg2:      #0d0d10;
+  --bg3:      #141418;
+  --card:     #101014;
+  --card2:    #18181e;
+  --border:   #202028;
+  --border2:  #1a1a22;
+  --gold:     #c8960c;
+  --gold2:    #e0a820;
+  --gold3:    #f2c040;
+  --goldglow: rgba(200,150,12,0.16);
+  --goldtext:  #f5d060;
+  --green:    #18a848;
+  --green2:   #20c060;
+  --greenglow:rgba(24,168,72,0.13);
+  --red:      #d83232;
+  --yellow:   #d89020;
+  --text:     #eeede8;
+  --text2:    #c4c3bc;
+  --muted:    #545460;
+  --muted2:   #78787e;
+  --r:        16px;
+  --rsm:      10px;
+  --safe-t:   env(safe-area-inset-top,0px);
+  --safe-b:   env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overscroll-behavior:none;overflow:hidden;}
+#app{height:100%;display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative;overflow:hidden;}
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden;}
+.screen.active{display:flex;}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(72px + var(--safe-b) + 16px);}
+.scroll::-webkit-scrollbar{display:none;}
+.safe-top{height:var(--safe-t);background:var(--bg);flex-shrink:0;}
+
+/* ══════════════════════════════════════════
+   3D GOLD ICONS  — inline SVG system
+══════════════════════════════════════════ */
+/* Each icon is a standalone SVG with gold gradient + depth */
+.icon3d{display:block;flex-shrink:0;}
+
+/* ══════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════ */
+#login-screen{
+  justify-content:center;align-items:center;
+  padding:40px 28px calc(40px + var(--safe-b));
+  background:var(--bg);gap:0;
+}
+.login-wordmark{
+  font-size:11px;font-weight:700;letter-spacing:5px;
+  text-transform:uppercase;color:var(--muted2);margin-bottom:40px;
+}
+.login-lockup{
+  display:flex;flex-direction:column;align-items:center;
+  gap:16px;margin-bottom:48px;
+}
+.login-icon-3d{
+  width:76px;height:76px;
+  filter:drop-shadow(0 6px 24px rgba(200,150,12,0.35)) drop-shadow(0 2px 8px rgba(200,150,12,0.2));
+}
+.login-lockup-text{text-align:center;}
+.login-lockup-text h1{font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+.login-lockup-text p{font-size:13px;color:var(--muted2);margin-top:4px;}
+
+.form-group{width:100%;margin-bottom:12px;}
+.form-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted2);margin-bottom:8px;display:block;}
+.form-input{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--rsm);padding:14px 16px;color:var(--text);
+  font-size:15px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;
+}
+.form-input:focus{border-color:rgba(200,150,12,.5);box-shadow:0 0 0 3px rgba(200,150,12,.07);}
+.form-input::placeholder{color:var(--muted);}
+.btn{
+  width:100%;padding:15px;border-radius:var(--rsm);
+  font-size:15px;font-weight:700;font-family:inherit;
+  cursor:pointer;border:none;transition:opacity .15s,transform .1s;margin-top:4px;
+}
+.btn:active{transform:scale(.98);opacity:.85;}
+.btn-gold{background:linear-gradient(135deg,#b88010,#e0a820 50%,#c89018);color:#0a0800;letter-spacing:.2px;}
+.login-error{color:var(--red);font-size:13px;text-align:center;margin-top:10px;min-height:18px;}
+
+/* ══════════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════════ */
+.bottom-nav{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(8,8,10,.97);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-b);z-index:100;
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 8px;cursor:pointer;gap:5px;position:relative;}
+.nav-item .ni-icon{width:24px;height:24px;transition:filter .2s;}
+.nav-item span{font-size:10px;font-weight:500;color:var(--muted);transition:color .2s;}
+.nav-item.active span{color:var(--gold2);}
+.nav-item .ni-icon svg{display:block;}
+/* inactive nav icons — plain stroke */
+.nav-item:not(.active) .ni-icon .ic-active{display:none;}
+.nav-item:not(.active) .ni-icon .ic-inactive{display:block;}
+.nav-item.active .ni-icon .ic-active{display:block;}
+.nav-item.active .ni-icon .ic-inactive{display:none;}
+
+/* ══════════════════════════════════════════
+   PROFILE CARD
+══════════════════════════════════════════ */
+.profile-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;margin:0 16px;
+  display:flex;align-items:flex-start;gap:14px;
+  position:relative;overflow:hidden;
+}
+.profile-card::before{
+  content:'';position:absolute;top:0;right:0;
+  width:130px;height:130px;
+  background:radial-gradient(circle at top right,rgba(200,150,12,.07),transparent 70%);
+  pointer-events:none;
+}
+.avatar-wrap{position:relative;flex-shrink:0;}
+.avatar{
+  width:50px;height:50px;border-radius:50%;
+  background:linear-gradient(145deg,#161200,#282000);
+  border:1.5px solid rgba(200,150,12,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:800;color:var(--gold3);letter-spacing:-0.5px;
+}
+.profile-body{flex:1;min-width:0;}
+.profile-name{font-size:17px;font-weight:700;letter-spacing:-.3px;}
+.pmeta{display:flex;align-items:center;gap:5px;margin-top:4px;flex-wrap:wrap;}
+.pmeta-item{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--muted2);}
+.pmeta-item svg{width:11px;height:11px;flex-shrink:0;color:var(--muted);}
+.pmeta-dot{width:2px;height:2px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.profile-date{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted2);margin-top:5px;}
+.profile-date svg{width:11px;height:11px;color:var(--muted);}
+.badge-nivel{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.28);
+  color:var(--gold3);padding:3px 10px;border-radius:20px;
+  font-size:11px;font-weight:700;margin-top:8px;
+}
+.badge-nivel .bn-icon{width:13px;height:13px;filter:drop-shadow(0 1px 3px rgba(200,150,12,.5));}
+.profile-settings{
+  width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;color:var(--muted2);
+}
+.profile-settings svg{width:16px;height:16px;}
+
+/* ══════════════════════════════════════════
+   METRIC GRID
+══════════════════════════════════════════ */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 16px 0;}
+.metric-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;position:relative;overflow:hidden;
+}
+.metric-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;
+  height:2px;border-radius:0 0 var(--r) var(--r);opacity:.3;
+}
+.metric-card.mc-gold::after{background:linear-gradient(90deg,var(--gold2),transparent);}
+.metric-card.mc-green::after{background:linear-gradient(90deg,var(--green2),transparent);}
+.metric-card.mc-purple::after{background:linear-gradient(90deg,#a855f7,transparent);}
+.metric-card.mc-blue::after{background:linear-gradient(90deg,#6366f1,transparent);}
+.mc-icon{width:38px;height:38px;margin-bottom:12px;filter:drop-shadow(0 4px 12px rgba(200,150,12,.25));}
+.mc-icon.mc-green-icon{filter:drop-shadow(0 4px 12px rgba(24,168,72,.2));}
+.mc-icon.mc-purple-icon{filter:drop-shadow(0 4px 12px rgba(168,85,247,.2));}
+.mc-icon.mc-blue-icon{filter:drop-shadow(0 4px 12px rgba(99,102,241,.2));}
+.metric-label{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted2);margin-bottom:5px;}
+.metric-value{font-size:22px;font-weight:800;letter-spacing:-.8px;line-height:1;}
+.mv-gold{color:var(--gold3);}
+.mv-green{color:var(--green2);}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:5px;}
+
+/* ══════════════════════════════════════════
+   SECTION HEADERS
+══════════════════════════════════════════ */
+.section-hd{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 10px;}
+.section-hd-left{display:flex;align-items:center;gap:8px;}
+.section-hd-icon{width:26px;height:26px;filter:drop-shadow(0 2px 8px rgba(200,150,12,.3));}
+.section-hd-title{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);}
+.section-toggle{color:var(--muted);cursor:pointer;transition:transform .2s;}
+.section-toggle svg{width:16px;height:16px;display:block;}
+.section-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin:0 16px;overflow:hidden;}
+
+/* Deps table */
+.dtbl-hd{display:grid;grid-template-columns:64px 1fr 110px;padding:9px 16px;border-bottom:1px solid var(--border2);}
+.dtbl-hd span{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.dtbl-hd span:last-child{text-align:right;}
+.dtbl-row{display:grid;grid-template-columns:64px 1fr 110px;padding:13px 16px;border-bottom:1px solid var(--border2);align-items:center;}
+.dtbl-row:last-child{border-bottom:none;}
+.dtbl-id{font-size:14px;font-weight:600;color:var(--text2);}
+.dtbl-val{font-size:15px;font-weight:700;color:var(--green2);}
+.dtbl-st{display:flex;justify-content:flex-end;}
+
+/* Status badges */
+.sbadge{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.sbadge svg{width:11px;height:11px;flex-shrink:0;}
+.sb-green{background:rgba(24,168,72,.14);color:var(--green2);}
+.sb-yellow{background:rgba(216,144,32,.12);color:var(--yellow);}
+.sb-red{background:rgba(216,50,50,.1);color:var(--red);}
+
+/* Comm table */
+.ctbl-hd{display:grid;grid-template-columns:50px 1fr 62px 88px;padding:9px 16px;border-bottom:1px solid var(--border2);}
+.ctbl-hd span{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.ctbl-hd span:last-child{text-align:right;}
+.ctbl-row{display:grid;grid-template-columns:50px 1fr 62px 88px;padding:13px 16px;border-bottom:1px solid var(--border2);align-items:center;}
+.ctbl-row:last-child{border-bottom:none;}
+.cnivel{
+  background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.28);
+  color:var(--gold3);font-size:11px;font-weight:800;
+  padding:4px 6px;border-radius:7px;text-align:center;display:inline-block;
+}
+.cdep{font-size:13px;font-weight:700;color:var(--green2);}
+.cperc{font-size:13px;color:var(--text2);}
+.cval{font-size:13px;font-weight:700;color:var(--gold3);text-align:right;}
+
+/* ══════════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════════ */
+.page-hdr{padding:12px 16px 14px;background:var(--bg);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.phdr-back{width:38px;height:38px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);flex-shrink:0;}
+.phdr-back svg{width:16px;height:16px;}
+.phdr-title{flex:1;text-align:center;}
+.phdr-title h1{font-size:16px;font-weight:700;}
+.phdr-title p{font-size:11.5px;color:var(--muted2);margin-top:2px;}
+.phdr-action{width:38px;height:38px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);flex-shrink:0;}
+.phdr-action svg{width:15px;height:15px;}
+.phdr-spacer{width:38px;flex-shrink:0;}
+
+/* ══════════════════════════════════════════
+   PLAYERS SCREEN
+══════════════════════════════════════════ */
+.players-total{
+  margin:0 16px 14px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;display:flex;align-items:center;gap:14px;
+}
+.pt-icon{width:44px;height:44px;filter:drop-shadow(0 4px 16px rgba(24,168,72,.25));}
+.pt-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted2);}
+.pt-value{font-size:28px;font-weight:900;letter-spacing:-1px;margin-top:2px;}
+.plhd{display:grid;grid-template-columns:1fr 90px 90px 22px;padding:6px 16px 8px;gap:8px;}
+.plhd span{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.plhd span:nth-child(3){text-align:right;}
+.player-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;}
+.player-row:active{background:var(--bg3);}
+.player-row:last-child{border-bottom:none;}
+.player-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;}
+.player-info{flex:1;min-width:0;}
+.player-name{font-size:14px;font-weight:600;}
+.player-email{font-size:11.5px;color:var(--muted2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.player-phone{font-size:11px;color:var(--muted);margin-top:1px;}
+.player-cad{flex-shrink:0;text-align:center;min-width:72px;}
+.player-cad-date{font-size:12px;font-weight:600;color:var(--text2);}
+.player-cad-time{font-size:11px;color:var(--muted);}
+.player-deps{flex-shrink:0;text-align:right;min-width:78px;}
+.player-dep-count{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.player-dep-val{font-size:13px;font-weight:700;color:var(--green2);}
+.pchev{color:var(--muted);flex-shrink:0;}
+.pchev svg{width:14px;height:14px;}
+
+/* ══════════════════════════════════════════
+   DEPOSITS SCREEN
+══════════════════════════════════════════ */
+.deps-total{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px;margin:0 16px 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.depstot-left{display:flex;align-items:center;gap:12px;}
+.depstot-icon{width:44px;height:44px;filter:drop-shadow(0 4px 16px rgba(24,168,72,.25));}
+.depstot-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted2);}
+.depstot-value{font-size:24px;font-weight:900;letter-spacing:-.8px;color:var(--green2);margin-top:2px;}
+.depstot-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.filter-btn{
+  background:var(--bg3);border:1px solid var(--border);border-radius:9px;
+  padding:7px 12px;color:var(--text2);font-size:12px;font-weight:600;
+  font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:6px;flex-shrink:0;
+}
+.filter-btn svg{width:12px;height:12px;color:var(--muted2);}
+.dep-full-row{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;}
+.dep-full-row:active{background:var(--bg3);}
+.dep-full-row:last-child{border-bottom:none;}
+.dcal{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dcal svg{width:17px;height:17px;}
+.dcal-g{background:rgba(24,168,72,.12);}
+.dcal-y{background:rgba(216,144,32,.1);}
+.dcal-r{background:rgba(216,50,50,.08);}
+.dcal-g svg{color:var(--green2);}
+.dcal-y svg{color:var(--yellow);}
+.dcal-r svg{color:var(--red);}
+.depdt{flex-shrink:0;min-width:82px;}
+.depdt-date{font-size:12px;font-weight:600;color:var(--text2);}
+.depdt-time{font-size:11px;color:var(--muted);margin-top:1px;}
+.depmid{flex:1;min-width:0;}
+.depmid-id{font-size:13px;font-weight:700;}
+.depmid-method{font-size:11px;color:var(--muted2);margin-top:1px;}
+.depright{text-align:right;flex-shrink:0;min-width:88px;}
+.depright-val{font-size:14px;font-weight:800;letter-spacing:-.3px;}
+.drv-g{color:var(--green2);}
+.drv-m{color:var(--muted2);}
+.depright-st{margin-top:4px;}
+.depchev{color:var(--muted);flex-shrink:0;}
+.depchev svg{width:14px;height:14px;}
+.deps-end{display:flex;flex-direction:column;align-items:center;gap:6px;padding:28px 24px;color:var(--muted);}
+.deps-end svg{width:18px;height:18px;opacity:.35;}
+.deps-end span{font-size:12px;}
+
+/* ══════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════ */
+.settings-profile{
+  margin:16px 16px 20px;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px;display:flex;align-items:center;gap:16px;
+  position:relative;overflow:hidden;
+}
+.settings-profile::before{content:'';position:absolute;top:0;right:0;width:100px;height:100px;background:radial-gradient(circle at top right,rgba(200,150,12,.06),transparent 70%);pointer-events:none;}
+.settings-avatar{
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(145deg,#161200,#282000);
+  border:1.5px solid rgba(200,150,12,.38);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:800;color:var(--gold3);flex-shrink:0;
+}
+.sp-name{font-size:17px;font-weight:700;}
+.sp-tel{font-size:13px;color:var(--muted2);margin-top:3px;}
+.st-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);padding:0 16px 8px;}
+.st-group{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin:0 16px 20px;overflow:hidden;}
+.st-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .1s;}
+.st-row:active{background:var(--bg3);}
+.st-row:last-child{border-bottom:none;}
+.str-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.str-icon svg{width:16px;height:16px;}
+.stri-gold{background:var(--goldglow);color:var(--gold2);}
+.stri-blue{background:rgba(99,102,241,.1);color:#818cf8;}
+.stri-red{background:rgba(216,50,50,.08);color:var(--red);}
+.str-body{flex:1;}
+.str-body strong{font-size:14px;font-weight:600;display:block;}
+.str-body span{font-size:12px;color:var(--muted2);display:block;margin-top:1px;word-break:break-all;}
+.str-chev{color:var(--muted);flex-shrink:0;}
+.str-chev svg{width:14px;height:14px;}
+.str-danger strong{color:var(--red);}
+
+/* ══════════════════════════════════════════
+   LOADING / EMPTY
+══════════════════════════════════════════ */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px;gap:10px;color:var(--muted);font-size:13px;}
+.spinner{width:26px;height:26px;border:2px solid var(--border);border-top-color:var(--gold2);border-radius:50%;animation:spin .65s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px 24px;gap:10px;color:var(--muted);text-align:center;}
+.empty svg{width:36px;height:36px;opacity:.2;}
+.empty p{font-size:13px;line-height:1.6;color:var(--muted2);}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+#toast{
+  position:fixed;top:calc(var(--safe-t) + 16px);left:50%;
+  transform:translateX(-50%) translateY(-140px);
+  background:var(--card2);border:1px solid var(--border);border-radius:14px;
+  padding:13px 18px;font-size:13px;font-weight:600;z-index:9999;
+  transition:transform .38s cubic-bezier(.34,1.56,.64,1);
+  max-width:340px;width:calc(100% - 32px);
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 10px 40px rgba(0,0,0,.6);
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+#toast.success{border-color:rgba(24,168,72,.35);}
+#toast.error{border-color:rgba(216,50,50,.35);}
+#toast.info{border-color:rgba(200,150,12,.35);}
+.toast-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.td-success{background:var(--green2);}
+.td-error{background:var(--red);}
+.td-info{background:var(--gold2);}
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;display:none;align-items:flex-end;}
+.modal-overlay.open{display:flex;}
+.modal-sheet{width:100%;max-width:430px;margin:0 auto;background:var(--bg2);border-top:1px solid var(--border);border-top-left-radius:22px;border-top-right-radius:22px;max-height:80vh;overflow-y:auto;padding-bottom:calc(20px + var(--safe-b));}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 20px;}
+.modal-title{font-size:18px;font-weight:700;padding:0 20px 16px;}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:13px 20px;border-bottom:1px solid var(--border2);}
+.mrow:last-child{border-bottom:none;}
+.mrow-label{font-size:13px;color:var(--muted2);}
+.mrow-value{font-size:14px;font-weight:700;}
+
+/* FCM status indicator */
+.fcm-status{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:600;padding:4px 10px;
+  border-radius:20px;margin-top:4px;
+}
+.fcm-on{background:rgba(24,168,72,.12);color:var(--green2);}
+.fcm-off{background:rgba(84,84,96,.15);color:var(--muted2);}
+.fcm-dot{width:6px;height:6px;border-radius:50%;}
+.fcm-on .fcm-dot{background:var(--green2);}
+.fcm-off .fcm-dot{background:var(--muted);}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══════════════════════════════════════
+     SVG DEFS  – gold 3-D gradients
+══════════════════════════════════════ -->
+<svg width="0" height="0" style="position:absolute;">
+  <defs>
+    <!-- Pirâmide dourada (logo / login) -->
+    <!-- Gold gradient primary -->
+    <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#f8e080"/>
+      <stop offset="40%"  stop-color="#e0a820"/>
+      <stop offset="100%" stop-color="#8a5c08"/>
+    </linearGradient>
+    <linearGradient id="gGoldH" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#f8e080"/>
+      <stop offset="100%" stop-color="#c88010"/>
+    </linearGradient>
+    <linearGradient id="gGoldSide" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#d4a020"/>
+      <stop offset="100%" stop-color="#6a4008"/>
+    </linearGradient>
+    <!-- green 3D -->
+    <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#50e890"/>
+      <stop offset="60%"  stop-color="#18a848"/>
+      <stop offset="100%" stop-color="#0a5828"/>
+    </linearGradient>
+    <!-- blue 3D -->
+    <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#a0b8ff"/>
+      <stop offset="60%"  stop-color="#4060e0"/>
+      <stop offset="100%" stop-color="#182880"/>
+    </linearGradient>
+    <!-- purple 3D -->
+    <linearGradient id="gPurple" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#d8a0ff"/>
+      <stop offset="60%"  stop-color="#9030d0"/>
+      <stop offset="100%" stop-color="#501880"/>
+    </linearGradient>
+    <!-- shadow for icons -->
+    <filter id="shadow3d" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="shadowGold" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="rgba(200,140,0,.6)" flood-opacity="1"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ══════════════════════════════════════
+     LOGIN
+══════════════════════════════════════ -->
+<div id="login-screen" class="screen active" style="display:flex">
+  <div class="login-wordmark">Gerente Afiliado</div>
+  <div class="login-lockup">
+    <!-- 3D Pyramid icon -->
+    <svg class="login-icon-3d" viewBox="0 0 76 76" fill="none">
+      <!-- base shadow -->
+      <ellipse cx="38" cy="70" rx="24" ry="4" fill="rgba(0,0,0,0.5)"/>
+      <!-- pyramid front face -->
+      <polygon points="38,8 60,64 16,64" fill="url(#gGold)" filter="url(#shadowGold)"/>
+      <!-- pyramid right shadow face -->
+      <polygon points="38,8 60,64 38,56" fill="url(#gGoldSide)" opacity=".7"/>
+      <!-- top highlight -->
+      <polygon points="38,8 50,36 38,32" fill="rgba(255,240,180,.4)"/>
+      <!-- bottom highlight line -->
+      <line x1="16" y1="64" x2="60" y2="64" stroke="rgba(255,220,120,.5)" stroke-width="1.5"/>
+    </svg>
+    <div class="login-lockup-text">
+      <h1>Painel do Gerente</h1>
+      <p>Gerencie sua rede de indicações</p>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Telefone</label>
+    <input class="form-input" id="login-tel" type="tel" placeholder="(11) 99999-9999"/>
+  </div>
+  <div class="form-group" style="margin-bottom:20px;">
+    <label class="form-label">Senha</label>
+    <input class="form-input" id="login-pass" type="password" placeholder="••••••••"/>
+  </div>
+  <button class="btn btn-gold" id="login-btn" onclick="doLogin()">Entrar</button>
+  <div class="login-error" id="login-error"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════ -->
+<div id="main-app" style="display:none;flex-direction:column;height:100%;position:relative;">
+
+  <!-- ─── DASHBOARD ─── -->
+  <div id="dash-screen" class="screen active">
+    <div class="safe-top"></div>
+    <div class="scroll">
+      <!-- Profile -->
+      <div style="padding:16px 0 12px;">
+        <div class="profile-card">
+          <div class="avatar-wrap">
+            <div class="avatar" id="dash-avatar">J</div>
+          </div>
+          <div class="profile-body">
+            <div class="profile-name" id="dash-nome">—</div>
+            <div class="pmeta">
+              <div class="pmeta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+                <span id="dash-email">—</span>
+              </div>
+              <div class="pmeta-dot"></div>
+              <div class="pmeta-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.62 5 2 2 0 0 1 3.6 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 10.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 17.92z"/></svg>
+                <span id="dash-tel">—</span>
+              </div>
+            </div>
+            <div class="profile-date">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span id="dash-data">Cadastro: —</span>
+            </div>
+            <div>
+              <span class="badge-nivel">
+                <!-- 3D star -->
+                <svg class="bn-icon" viewBox="0 0 14 14" fill="none">
+                  <polygon points="7,1 8.8,5.2 13.2,5.6 10,8.6 11,13 7,10.6 3,13 4,8.6 0.8,5.6 5.2,5.2" fill="url(#gGold)"/>
+                  <polygon points="7,1 8.8,5.2 7,5 5.2,5.2" fill="rgba(255,240,180,.5)"/>
+                </svg>
+                <span id="dash-nivel">Nível 1</span>
+              </span>
+            </div>
+          </div>
+          <div class="profile-settings" onclick="showScreen('settings-screen')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metric-grid">
+        <div class="metric-card mc-gold">
+          <!-- 3D wallet icon -->
+          <svg class="mc-icon" viewBox="0 0 38 38" fill="none">
+            <rect x="2" y="10" width="34" height="22" rx="4" fill="url(#gGold)" filter="url(#shadow3d)"/>
+            <rect x="2" y="10" width="34" height="6" rx="2" fill="rgba(255,240,160,.3)"/>
+            <rect x="26" y="18" width="8" height="8" rx="2" fill="rgba(0,0,0,.3)"/>
+            <circle cx="30" cy="22" r="2" fill="rgba(255,230,100,.8)"/>
+            <rect x="6" y="6" width="20" height="6" rx="2" fill="url(#gGoldH)" opacity=".7"/>
+          </svg>
+          <div class="metric-label">Total Depositado</div>
+          <div class="metric-value mv-gold" id="dash-total-dep">R$ 0,00</div>
+          <div class="metric-sub" id="dash-dep-count">0 depósitos</div>
+        </div>
+        <div class="metric-card mc-green">
+          <!-- 3D coin icon -->
+          <svg class="mc-icon mc-green-icon" viewBox="0 0 38 38" fill="none">
+            <ellipse cx="19" cy="26" rx="14" ry="4" fill="rgba(0,0,0,.3)"/>
+            <circle cx="19" cy="18" r="14" fill="url(#gGreen)" filter="url(#shadow3d)"/>
+            <circle cx="19" cy="18" r="10" fill="rgba(0,0,0,.15)"/>
+            <text x="19" y="23" text-anchor="middle" font-size="14" font-weight="900" fill="rgba(255,255,255,.9)" font-family="Arial">$</text>
+            <ellipse cx="14" cy="12" rx="4" ry="2" fill="rgba(255,255,255,.2)" transform="rotate(-20,14,12)"/>
+          </svg>
+          <div class="metric-label">Comissão p/ Você</div>
+          <div class="metric-value mv-green" id="dash-comissao">R$ 0,00</div>
+          <div class="metric-sub" id="dash-op-count">0 operações</div>
+        </div>
+        <div class="metric-card mc-purple">
+          <!-- 3D gamepad icon -->
+          <svg class="mc-icon mc-purple-icon" viewBox="0 0 38 38" fill="none">
+            <rect x="3" y="12" width="32" height="18" rx="6" fill="url(#gPurple)" filter="url(#shadow3d)"/>
+            <rect x="3" y="12" width="32" height="7" rx="4" fill="rgba(255,255,255,.08)"/>
+            <rect x="8" y="19" width="3" height="7" rx="1.5" fill="rgba(255,255,255,.4)"/>
+            <rect x="6" y="21" width="7" height="3" rx="1.5" fill="rgba(255,255,255,.4)"/>
+            <circle cx="26" cy="20" r="2" fill="rgba(255,255,255,.5)"/>
+            <circle cx="30" cy="24" r="2" fill="rgba(255,255,255,.5)"/>
+          </svg>
+          <div class="metric-label">Partidas Jogadas</div>
+          <div class="metric-value" id="dash-partidas">0</div>
+          <div class="metric-sub">Partidas</div>
+        </div>
+        <div class="metric-card mc-blue">
+          <!-- 3D people icon -->
+          <svg class="mc-icon mc-blue-icon" viewBox="0 0 38 38" fill="none">
+            <ellipse cx="15" cy="36" rx="10" ry="3" fill="rgba(0,0,0,.3)"/>
+            <circle cx="15" cy="12" r="7" fill="url(#gBlue)" filter="url(#shadow3d)"/>
+            <ellipse cx="11" cy="9" rx="3" ry="2" fill="rgba(255,255,255,.25)" transform="rotate(-20,11,9)"/>
+            <path d="M5 30 Q5 22 15 22 Q25 22 25 30" fill="url(#gBlue)" filter="url(#shadow3d)"/>
+            <circle cx="27" cy="10" r="5" fill="rgba(100,140,255,.7)" filter="url(#shadow3d)"/>
+            <path d="M21 28 Q21 22 27 22 Q33 22 33 28" fill="rgba(100,140,255,.6)" filter="url(#shadow3d)"/>
+          </svg>
+          <div class="metric-label">Total Cadastrados</div>
+          <div class="metric-value" id="dash-total-cad">0</div>
+          <div class="metric-sub" id="dash-dep-cad">0 depositou</div>
+        </div>
+      </div>
+
+      <!-- Últimos Depósitos -->
+      <div class="section-hd">
+        <div class="section-hd-left">
+          <!-- 3D clock icon -->
+          <svg class="section-hd-icon" viewBox="0 0 26 26" fill="none">
+            <circle cx="13" cy="13" r="11" fill="url(#gGold)" filter="url(#shadow3d)"/>
+            <circle cx="13" cy="13" r="8" fill="rgba(0,0,0,.25)"/>
+            <line x1="13" y1="7" x2="13" y2="13" stroke="rgba(255,240,180,.9)" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="13" y1="13" x2="17" y2="15" stroke="rgba(255,240,180,.9)" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="13" cy="13" r="1.5" fill="rgba(255,240,180,.9)"/>
+            <ellipse cx="9" cy="8" rx="3" ry="1.5" fill="rgba(255,255,255,.2)" transform="rotate(-30,9,8)"/>
+          </svg>
+          <span class="section-hd-title">Últimos Depósitos</span>
+        </div>
+        <div class="section-toggle" id="deps-toggle" onclick="toggleSection('deps')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+      </div>
+      <div class="section-box" id="deps-section">
+        <div class="dtbl-hd"><span>#</span><span>Valor</span><span>Status</span></div>
+        <div id="dash-deps-list"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+
+      <!-- Comissões -->
+      <div class="section-hd" style="margin-top:6px;">
+        <div class="section-hd-left">
+          <!-- 3D dollar circle -->
+          <svg class="section-hd-icon" viewBox="0 0 26 26" fill="none">
+            <circle cx="13" cy="13" r="11" fill="url(#gGold)" filter="url(#shadow3d)"/>
+            <circle cx="13" cy="13" r="8" fill="rgba(0,0,0,.22)"/>
+            <text x="13" y="18" text-anchor="middle" font-size="11" font-weight="900" fill="rgba(255,248,200,.95)" font-family="Arial">$</text>
+            <ellipse cx="9" cy="8" rx="3" ry="1.5" fill="rgba(255,255,255,.22)" transform="rotate(-30,9,8)"/>
+          </svg>
+          <span class="section-hd-title">Comissões Recebidas</span>
+        </div>
+        <div class="section-toggle" id="comm-toggle" onclick="toggleSection('comm')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+      </div>
+      <div class="section-box" id="comm-section" style="margin-bottom:8px;">
+        <div class="ctbl-hd"><span>Nível</span><span>Depósito</span><span>% Usado</span><span>Comissão</span></div>
+        <div id="dash-comm-list"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+      <div style="height:8px;"></div>
+    </div>
+  </div>
+
+  <!-- ─── PLAYERS ─── -->
+  <div id="players-screen" class="screen">
+    <div class="safe-top"></div>
+    <div class="page-hdr">
+      <div class="phdr-spacer"></div>
+      <div class="phdr-title"><h1>Meus Jogadores</h1><p>Todos os jogadores cadastrados por você</p></div>
+      <div class="phdr-spacer"></div>
+    </div>
+    <div class="scroll">
+      <div id="players-total-wrap"></div>
+      <div class="plhd">
+        <span>Jogador</span><span style="text-align:center;">Cadastro</span><span>Depósitos</span><span></span>
+      </div>
+      <div class="section-box" style="margin-bottom:16px;">
+        <div id="players-list"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── DEPOSITS ─── -->
+  <div id="depositos-screen" class="screen">
+    <div class="safe-top"></div>
+    <div class="page-hdr">
+      <div class="phdr-spacer"></div>
+      <div class="phdr-title"><h1>Histórico de Depósitos</h1><p>Todos os depósitos realizados por você</p></div>
+      <div class="phdr-action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      </div>
+    </div>
+    <div class="scroll">
+      <div id="dep-total-wrap" style="padding:0 16px 14px;"></div>
+      <div class="section-box" style="margin-bottom:0;">
+        <div id="deps-list"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+      <div class="deps-end">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Fim do histórico</span>
+        <span style="color:var(--muted);font-size:11px;">Você visualizou todos os depósitos realizados.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SETTINGS ─── -->
+  <div id="settings-screen" class="screen">
+    <div class="safe-top"></div>
+    <div class="page-hdr">
+      <div class="phdr-back" onclick="showScreen('dash-screen')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      <div class="phdr-title"><h1>Configurações</h1></div>
+      <div class="phdr-spacer"></div>
+    </div>
+    <div class="scroll">
+      <div class="settings-profile">
+        <div class="settings-avatar" id="settings-avatar">J</div>
+        <div>
+          <div class="sp-name" id="settings-nome">—</div>
+          <div class="sp-tel" id="settings-tel">—</div>
+          <div style="margin-top:8px;">
+            <span class="badge-nivel">
+              <svg class="bn-icon" viewBox="0 0 14 14" fill="none"><polygon points="7,1 8.8,5.2 13.2,5.6 10,8.6 11,13 7,10.6 3,13 4,8.6 0.8,5.6 5.2,5.2" fill="url(#gGold)"/></svg>
+              Afiliado
+            </span>
+          </div>
+          <div id="fcm-badge" class="fcm-status fcm-off"><div class="fcm-dot"></div><span>Notificações desativadas</span></div>
+        </div>
+      </div>
+
+      <div class="st-title">Conta</div>
+      <div class="st-group">
+        <div class="st-row" onclick="copyLink()">
+          <div class="str-icon stri-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+          <div class="str-body"><strong>Link de indicação</strong><span id="settings-link">—</span></div>
+          <div class="str-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <div class="st-row" onclick="setupFCM()">
+          <div class="str-icon stri-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div class="str-body"><strong>Ativar notificações push</strong><span>Receba alertas mesmo com o app fechado</span></div>
+          <div class="str-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="st-title">Sessão</div>
+      <div class="st-group">
+        <div class="st-row str-danger" onclick="doLogout()">
+          <div class="str-icon stri-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+          <div class="str-body"><strong>Sair da conta</strong></div>
+          <div class="str-chev"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" id="nav-dash" onclick="showScreen('dash-screen')">
+      <div class="ni-icon">
+        <!-- active: 3D gold house -->
+        <svg class="ic-active" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <polygon points="12,2 22,10 22,22 2,22 2,10" fill="url(#gGold)" filter="url(#shadow3d)"/>
+          <polygon points="12,2 22,10 12,8" fill="rgba(255,240,160,.3)"/>
+          <rect x="9" y="14" width="6" height="8" rx="1" fill="rgba(0,0,0,.3)"/>
+        </svg>
+        <!-- inactive: plain stroke -->
+        <svg class="ic-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#545460" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item" id="nav-players" onclick="showScreen('players-screen')">
+      <div class="ni-icon">
+        <svg class="ic-active" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <circle cx="9" cy="7" r="4" fill="url(#gGold)" filter="url(#shadow3d)"/>
+          <path d="M2 21 Q2 15 9 15 Q16 15 16 21" fill="url(#gGold)" filter="url(#shadow3d)"/>
+          <circle cx="19" cy="8" r="3" fill="rgba(200,150,12,.7)"/>
+          <path d="M16 20 Q16 16 19 16 Q22 16 22 20" fill="rgba(200,150,12,.6)"/>
+        </svg>
+        <svg class="ic-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#545460" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <span>Meus Jogadores</span>
+    </div>
+    <div class="nav-item" id="nav-deps" onclick="showScreen('depositos-screen')">
+      <div class="ni-icon">
+        <svg class="ic-active" width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="6" width="20" height="14" rx="3" fill="url(#gGold)" filter="url(#shadow3d)"/>
+          <rect x="2" y="6" width="20" height="5" rx="2" fill="rgba(255,240,160,.2)"/>
+          <rect x="16" y="12" width="4" height="4" rx="1" fill="rgba(0,0,0,.3)"/>
+          <circle cx="18" cy="14" r="1" fill="rgba(255,230,100,.8)"/>
+        </svg>
+        <svg class="ic-inactive" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#545460" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      </div>
+      <span>Depósitos</span>
+    </div>
+  </nav>
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="modal-overlay" id="player-modal" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-player-name">Jogador</div>
+    <div id="modal-player-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <div class="toast-dot td-success" id="toast-dot"></div>
+  <span id="toast-msg"></span>
+</div>
+
+</div><!-- #app -->
+
+<!-- ══════════════════════════════════════
+     FIREBASE SDK
+══════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════════════════
+const API  = 'https://bk-jogue.top';
+const VAPID_KEY = 'BKHdj7KeI3ZmM084-9U1izFN5gXeWb4gAR9kB3kIoE5BmkH6skjsUNX5vt0N6f1vUmrMRexVtIKwXUCzV9mp_8I';
+
+const FB_CONFIG = {
+  apiKey:            "AIzaSyDiWieGng5YLgjy1acq6wJyY5lHR9OWv3c",
+  authDomain:        "bk-jump.firebaseapp.com",
+  projectId:         "bk-jump",
+  storageBucket:     "bk-jump.firebasestorage.app",
+  messagingSenderId: "703828765865",
+  appId:             "1:703828765865:web:e9523b47e929724e85cdb8",
+  measurementId:     "G-F6XVS5F5D5"
+};
+
+// ════════════════════════════════════════════════════════════
+//  FIREBASE INIT
+// ════════════════════════════════════════════════════════════
+let fbApp, messaging, fcmToken = null;
+
+function initFirebase() {
+  try {
+    fbApp    = firebase.initializeApp(FB_CONFIG);
+    messaging = firebase.messaging(fbApp);
+
+    // Foreground messages (app aberto)
+    messaging.onMessage((payload) => {
+      console.log('[FCM] Foreground msg:', payload);
+      const t = payload.notification?.title || 'Alerta';
+      const b = payload.notification?.body  || '';
+      showToast(t + (b ? ': ' + b : ''), 'info');
+      // reload data when relevant
+      if (b.toLowerCase().includes('depósito') || b.toLowerCase().includes('cadastro')) {
+        loadAll();
+      }
+    });
+
+    // Restore saved token
+    const saved = localStorage.getItem('fcm_token');
+    if (saved) { fcmToken = saved; updateFcmBadge(true); }
+
+  } catch(e) {
+    console.warn('[FCM] Init error:', e);
+  }
+}
+
+async function setupFCM() {
+  if (!messaging) { showToast('Firebase não disponível neste browser.', 'error'); return; }
+
+  // Register SW first
+  if (!('serviceWorker' in navigator)) {
+    showToast('Service Worker não suportado neste browser.', 'error');
+    return;
+  }
+
+  try {
+    showToast('Solicitando permissão...', 'info');
+
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      showToast('Permissão negada. Ative nas configurações do sistema.', 'error');
+      return;
+    }
+
+    // Register firebase SW
+    const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+    await navigator.serviceWorker.ready;
+
+    const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+
+    if (token) {
+      fcmToken = token;
+      localStorage.setItem('fcm_token', token);
+      updateFcmBadge(true);
+      console.log('[FCM] Token:', token);
+      showToast('Notificações push ativadas com sucesso.', 'success');
+
+      // Opcional: enviar token ao backend para guardar
+      // sendTokenToBackend(token);
+    } else {
+      showToast('Não foi possível obter o token FCM.', 'error');
+    }
+  } catch(e) {
+    console.error('[FCM] Erro:', e);
+    showToast('Erro ao ativar notificações: ' + e.message, 'error');
+  }
+}
+
+function updateFcmBadge(active) {
+  const el = document.getElementById('fcm-badge');
+  if (!el) return;
+  if (active) {
+    el.className = 'fcm-status fcm-on';
+    el.innerHTML = '<div class="fcm-dot"></div><span>Notificações ativas</span>';
+  } else {
+    el.className = 'fcm-status fcm-off';
+    el.innerHTML = '<div class="fcm-dot"></div><span>Notificações desativadas</span>';
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  APP STATE
+// ════════════════════════════════════════════════════════════
+let token = localStorage.getItem('afil_token');
+let userData = null, indicacaoData = null;
+let allDeps = [], allPlayers = [];
+let currentDepFilter = 'todos', polling = null;
+let sections = { deps: true, comm: true };
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+async function init() {
+  initFirebase();
+  if (token) {
+    const ok = await fetchMe();
+    if (ok) { showApp(); return; }
+  }
+  showLogin();
+}
+
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('main-app').style.display = 'none';
+}
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  loadAll();
+  startPolling();
+}
+
+// ════════════════════════════════════════════════════════════
+//  API
+// ════════════════════════════════════════════════════════════
+async function api(path, opts = {}) {
+  const r = await fetch(API + path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, ...(opts.headers || {}) }
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function fetchMe() {
+  try { const d = await api('/api/auth/me'); userData = d.user; return true; } catch { return false; }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOGIN / LOGOUT
+// ════════════════════════════════════════════════════════════
+async function doLogin() {
+  const tel  = document.getElementById('login-tel').value.replace(/\D/g, '');
+  const pass = document.getElementById('login-pass').value;
+  const err  = document.getElementById('login-error');
+  const btn  = document.getElementById('login-btn');
+  err.textContent = '';
+  if (!tel || !pass) { err.textContent = 'Preencha todos os campos.'; return; }
+  btn.textContent = 'Entrando...'; btn.disabled = true;
+  try {
+    const d = await fetch(API + '/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ telefone: tel, senha: pass })
+    }).then(r => r.json());
+    if (d.error) throw new Error(d.error);
+    token = d.token; userData = d.user;
+    localStorage.setItem('afil_token', token);
+    showApp();
+  } catch(e) { err.textContent = e.message || 'Credenciais inválidas.'; }
+  finally { btn.textContent = 'Entrar'; btn.disabled = false; }
+}
+function doLogout() {
+  if (!confirm('Sair da conta?')) return;
+  token = null; userData = null;
+  localStorage.removeItem('afil_token');
+  stopPolling();
+  showLogin();
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOAD
+// ════════════════════════════════════════════════════════════
+async function loadAll() { await loadDashboard(); await loadPlayers(); await loadDepositos(); }
+
+async function loadDashboard() {
+  try {
+    const data = await api('/api/indicacao/info');
+    indicacaoData = data;
+    const name = userData?.nome || '—';
+    const ini  = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+    document.getElementById('dash-avatar').textContent = ini;
+    document.getElementById('dash-nome').textContent = name;
+    const em = userData?.email || '';
+    document.getElementById('dash-email').textContent = em ? em.replace(/(.{2}).+(@.+)/, '$1**$2') : '—';
+    const tel = String(userData?.telefone || '');
+    document.getElementById('dash-tel').textContent = tel ? '(11) ****-' + tel.slice(-4) : '—';
+    const ca = userData?.createdAt;
+    document.getElementById('dash-data').textContent = 'Cadastro: ' + (ca ? new Date(ca).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Sao_Paulo' }) : '—');
+
+    const n = data.total_indicados || 0;
+    document.getElementById('dash-nivel').textContent = n >= 20 ? 'Nível 5' : n >= 10 ? 'Nível 4' : n >= 5 ? 'Nível 3' : n >= 2 ? 'Nível 2' : 'Nível 1';
+
+    document.getElementById('settings-avatar').textContent = ini;
+    document.getElementById('settings-nome').textContent = name;
+    document.getElementById('settings-tel').textContent = tel || '—';
+    document.getElementById('settings-link').textContent = data.link || '—';
+
+    const rede = await api('/api/indicacao/rede');
+    const totalDep = rede.total?.total_depositos || 0;
+    const totalCad = rede.total?.total || 0;
+    const comissao = data.total_comissao || 0;
+    const tcDep    = data.total_com_deposito || 0;
+
+    document.getElementById('dash-total-dep').textContent = fmt(totalDep);
+    document.getElementById('dash-dep-count').textContent = tcDep + ' depósito' + (tcDep !== 1 ? 's' : '');
+    document.getElementById('dash-comissao').textContent  = fmt(comissao);
+    document.getElementById('dash-op-count').textContent  = tcDep + ' operações';
+    document.getElementById('dash-total-cad').textContent = totalCad;
+    document.getElementById('dash-dep-cad').textContent   = tcDep + ' depositou';
+    document.getElementById('dash-partidas').textContent  = '0';
+
+    renderDashDeps(data.indicados_recentes || []);
+    renderDashComm(rede);
+  } catch(e) { console.error(e); }
+}
+
+function renderDashDeps(indicados) {
+  const el   = document.getElementById('dash-deps-list');
+  const list = indicados.filter(i => i.has_deposited).slice(0, 5);
+  if (!list.length) { el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><p>Nenhum depósito registrado ainda.</p></div>`; return; }
+  el.innerHTML = list.map((ind, idx) => `
+    <div class="dtbl-row">
+      <div class="dtbl-id">${10700 + idx}</div>
+      <div class="dtbl-val">—</div>
+      <div class="dtbl-st"><span class="sbadge sb-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Aprovado</span></div>
+    </div>`).join('');
+}
+
+function renderDashComm(rede) {
+  const el = document.getElementById('dash-comm-list');
+  const rows = [];
+  if (rede.n1?.total_depositos > 0) rows.push({ n:'N1', dep:rede.n1.total_depositos, p:10, c:rede.n1.total_depositos*.10 });
+  if (rede.n2?.total_depositos > 0) rows.push({ n:'N2', dep:rede.n2.total_depositos, p:5,  c:rede.n2.total_depositos*.05 });
+  if (rede.n3?.total_depositos > 0) rows.push({ n:'N3', dep:rede.n3.total_depositos, p:2,  c:rede.n3.total_depositos*.02 });
+  if (!rows.length) { el.innerHTML = `<div class="empty"><p>Nenhuma comissão registrada ainda.</p></div>`; return; }
+  el.innerHTML = rows.map(r => `
+    <div class="ctbl-row">
+      <div class="cnivel">${r.n}</div>
+      <div class="cdep">${fmt(r.dep)}</div>
+      <div class="cperc">${r.p}.0%</div>
+      <div class="cval">${fmt(r.c)}</div>
+    </div>`).join('');
+}
+
+async function loadPlayers() {
+  try {
+    const data = await api('/api/indicacao/info');
+    allPlayers = data.indicados_recentes || [];
+    document.getElementById('players-total-wrap').innerHTML = `
+      <div class="players-total">
+        <svg class="pt-icon" viewBox="0 0 44 44" fill="none">
+          <ellipse cx="22" cy="42" rx="16" ry="3" fill="rgba(0,0,0,.3)"/>
+          <circle cx="17" cy="14" r="8" fill="url(#gGreen)" filter="url(#shadow3d)"/>
+          <path d="M5 36 Q5 26 17 26 Q29 26 29 36" fill="url(#gGreen)" filter="url(#shadow3d)"/>
+          <circle cx="32" cy="13" r="5.5" fill="rgba(24,168,72,.7)" filter="url(#shadow3d)"/>
+          <path d="M26 34 Q26 26 32 26 Q38 26 38 34" fill="rgba(24,168,72,.6)" filter="url(#shadow3d)"/>
+        </svg>
+        <div>
+          <div class="pt-label">Total de Jogadores</div>
+          <div class="pt-value">${allPlayers.length}</div>
+        </div>
+      </div>`;
+    renderPlayers(allPlayers);
+  } catch(e) { console.error(e); }
+}
+
+function renderPlayers(list) {
+  const el = document.getElementById('players-list');
+  if (!list.length) { el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>Nenhum jogador ainda.<br>Compartilhe seu link para começar.</p></div>`; return; }
+  const cls = ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#22c55e','#06b6d4','#ef4444','#14b8a6'];
+  el.innerHTML = list.map((p, i) => {
+    const c   = cls[i % cls.length];
+    const ini = p.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+    const dt  = new Date(p.data_cadastro);
+    return `
+      <div class="player-row" onclick="openPlayerModal(${i})">
+        <div class="player-av" style="background:${c}18;color:${c};">${ini}</div>
+        <div class="player-info">
+          <div class="player-name">${p.nome}</div>
+          <div class="player-email">${p.nome.toLowerCase().replace(' ','.')+'@email.com'}</div>
+          <div class="player-phone">Nível 1</div>
+        </div>
+        <div class="player-cad">
+          <div class="player-cad-date">${dt.toLocaleDateString('pt-BR')}</div>
+          <div class="player-cad-time">${dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+        <div class="player-deps">
+          <div class="player-dep-count">${p.has_deposited ? '1 depósito' : '0 depósitos'}</div>
+          <div class="player-dep-val">${p.has_deposited ? '—' : 'R$ 0,00'}</div>
+        </div>
+        <div class="pchev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>`;
+  }).join('');
+}
+
+async function loadDepositos() {
+  try {
+    const info = await api('/api/indicacao/info');
+    allDeps = (info.indicados_recentes || []).map((ind, idx) => ({
+      id: 10422 + idx * 100, valor: 0,
+      status: ind.has_deposited ? 'aprovado' : 'pendente',
+      createdAt: ind.data_cadastro, metodo: 'Pix'
+    }));
+    renderDepsTotal(allDeps);
+    renderDeps(allDeps, 'todos');
+  } catch(e) { console.error(e); }
+}
+
+function renderDepsTotal(list) {
+  const aprov = list.filter(d => d.status === 'aprovado');
+  const total = aprov.reduce((a, d) => a + (d.valor || 0), 0);
+  document.getElementById('dep-total-wrap').innerHTML = `
+    <div class="deps-total">
+      <div class="depstot-left">
+        <svg class="depstot-icon" viewBox="0 0 44 44" fill="none">
+          <rect x="2" y="10" width="40" height="26" rx="5" fill="url(#gGreen)" filter="url(#shadow3d)"/>
+          <rect x="2" y="10" width="40" height="9" rx="4" fill="rgba(255,255,255,.1)"/>
+          <rect x="30" y="20" width="10" height="10" rx="2.5" fill="rgba(0,0,0,.25)"/>
+          <circle cx="35" cy="25" r="2.5" fill="rgba(255,255,255,.5)"/>
+        </svg>
+        <div>
+          <div class="depstot-label">Total Depositado</div>
+          <div class="depstot-value">${fmt(total)}</div>
+          <div class="depstot-sub">${aprov.length} depósito${aprov.length !== 1 ? 's' : ''}</div>
+        </div>
+      </div>
+      <button class="filter-btn" onclick="cycleFilter(this)">
+        <span id="filter-label">Todos os status</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>`;
+}
+
+const FC = ['todos','aprovado','pendente','cancelado'];
+const FL = { todos:'Todos os status', aprovado:'Aprovado', pendente:'Pendente', cancelado:'Cancelado' };
+function cycleFilter() {
+  const idx = FC.indexOf(currentDepFilter);
+  currentDepFilter = FC[(idx + 1) % FC.length];
+  document.getElementById('filter-label').textContent = FL[currentDepFilter];
+  renderDeps(allDeps, currentDepFilter);
+}
+
+function renderDeps(list, filter) {
+  const filtered = filter === 'todos' ? list : list.filter(d => d.status === filter);
+  const el = document.getElementById('deps-list');
+  if (!filtered.length) { el.innerHTML = `<div class="empty"><p>Nenhum depósito encontrado.</p></div>`; return; }
+  el.innerHTML = filtered.map(d => {
+    const dt = new Date(d.createdAt);
+    const ig = d.status === 'aprovado', iy = d.status === 'pendente';
+    const dci = ig ? 'dcal-g' : iy ? 'dcal-y' : 'dcal-r';
+    const badge = ig
+      ? `<span class="sbadge sb-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px;height:11px;"><polyline points="20 6 9 17 4 12"/></svg>Aprovado</span>`
+      : iy
+        ? `<span class="sbadge sb-yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pendente</span>`
+        : `<span class="sbadge sb-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px;height:11px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Cancelado</span>`;
+    return `
+      <div class="dep-full-row">
+        <div class="dcal ${dci}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="depdt">
+          <div class="depdt-date">${dt.toLocaleDateString('pt-BR')}</div>
+          <div class="depdt-time">${dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
+        </div>
+        <div class="depmid">
+          <div class="depmid-id">#${d.id}</div>
+          <div class="depmid-method">${d.metodo}</div>
+        </div>
+        <div class="depright">
+          <div class="depright-val ${ig ? 'drv-g' : 'drv-m'}">${d.valor ? fmt(d.valor) : '—'}</div>
+          <div class="depright-st">${badge}</div>
+        </div>
+        <div class="depchev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+//  SECTIONS TOGGLE
+// ════════════════════════════════════════════════════════════
+function toggleSection(s) {
+  sections[s] = !sections[s];
+  const sid = s === 'deps' ? 'deps-section' : 'comm-section';
+  const tid = s + '-toggle';
+  document.getElementById(sid).style.display = sections[s] ? '' : 'none';
+  document.getElementById(tid).querySelector('svg').style.transform = sections[s] ? '' : 'rotate(180deg)';
+}
+
+// ════════════════════════════════════════════════════════════
+//  POLLING  – detects new signups / deposits
+// ════════════════════════════════════════════════════════════
+let lastN = 0, lastD = 0;
+function startPolling() {
+  polling = setInterval(async () => {
+    try {
+      const d = await api('/api/indicacao/info');
+      const nc = d.total_indicados || 0, nd = d.total_com_deposito || 0;
+      if (lastN > 0 && nc > lastN) {
+        const novo = d.indicados_recentes?.[0];
+        const msg  = (novo?.nome || 'Alguém') + ' se cadastrou pelo seu link.';
+        showToast(msg, 'info');
+        sendLocalNotif('Novo Cadastro', msg);
+        loadAll();
+      }
+      if (lastD > 0 && nd > lastD) {
+        const msg = 'Um indicado realizou um depósito.';
+        showToast(msg, 'success');
+        sendLocalNotif('Novo Depósito', msg);
+        loadAll();
+      }
+      lastN = nc; lastD = nd;
+    } catch(e) {}
+  }, 15000);
+}
+function stopPolling() { if (polling) clearInterval(polling); }
+
+// Fallback local notification (when FCM not available)
+function sendLocalNotif(title, body) {
+  if (Notification.permission === 'granted') {
+    new Notification(title, { body, icon: './icon-192.png', vibrate: [200,100,200] });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  NAV
+// ════════════════════════════════════════════════════════════
+const navMap = { 'dash-screen':'nav-dash', 'players-screen':'nav-players', 'depositos-screen':'nav-deps', 'settings-screen':null };
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const ni = navMap[id]; if (ni) document.getElementById(ni)?.classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════════
+//  MODAL
+// ════════════════════════════════════════════════════════════
+function openPlayerModal(idx) {
+  const p = allPlayers[idx]; if (!p) return;
+  document.getElementById('modal-player-name').textContent = p.nome;
+  const dt = new Date(p.data_cadastro).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+  document.getElementById('modal-player-body').innerHTML = `
+    <div class="mrow"><span class="mrow-label">Data de cadastro</span><span class="mrow-value">${dt}</span></div>
+    <div class="mrow"><span class="mrow-label">Nível</span><span class="mrow-value"><span class="badge-nivel"><svg class="bn-icon" viewBox="0 0 14 14" fill="none"><polygon points="7,1 8.8,5.2 13.2,5.6 10,8.6 11,13 7,10.6 3,13 4,8.6 0.8,5.6 5.2,5.2" fill="url(#gGold)"/></svg>Nível 1</span></span></div>
+    <div class="mrow"><span class="mrow-label">Depositou</span><span class="mrow-value" style="color:${p.has_deposited?'var(--green2)':'var(--muted2)'};">${p.has_deposited?'Sim':'Não'}</span></div>
+    <div class="mrow"><span class="mrow-label">Comissão recebida</span><span class="mrow-value" style="color:var(--gold3);">${p.has_deposited?'Recebida':'—'}</span></div>`;
+  document.getElementById('player-modal').classList.add('open');
+}
+function closeModal(e) { if (e.target === document.getElementById('player-modal')) document.getElementById('player-modal').classList.remove('open'); }
+
+// ════════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════════
+function fmt(v) { return 'R$ ' + Number(v||0).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+
+function copyLink() {
+  const link = indicacaoData?.link || document.getElementById('settings-link').textContent;
+  navigator.clipboard?.writeText(link).then(() => showToast('Link de indicação copiado.', 'success'));
+}
+
+let toastTimer = null;
+function showToast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  const d = document.getElementById('toast-dot');
+  d.className = 'toast-dot td-' + type;
+  el.className = 'show ' + type;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3400);
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+init();
+</script>
+</body>
+</html>
