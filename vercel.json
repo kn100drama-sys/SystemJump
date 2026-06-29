@@ -34,11 +34,11 @@
 
     {
       "source": "/gerentes",
-      "destination": "/parceiros.html"
+      "destination": "/parceiro.html"
     },
     {
       "source": "/gerente",
-      "destination": "/parceiros.html"
+      "destination": "/parceiro.html"
     }
   ]
 }
