@@ -10,6 +10,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Afiliado" />
   <link rel="manifest" href="manifest.json" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -841,6 +843,20 @@
 </div><!-- /app -->
 
 <script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDiWieGng5YLgjy1acq6wJyY5lHR9OWv3c",
+  authDomain: "bk-jump.firebaseapp.com",
+  projectId: "bk-jump",
+  storageBucket: "bk-jump.firebasestorage.app",
+  messagingSenderId: "703828765865",
+  appId: "1:703828765865:web:e9523b47e929724e85cdb8",
+  measurementId: "G-F6XVS5F5D5"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const messaging = firebase.messaging();
 // ════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════
@@ -857,6 +873,30 @@ let allDeps = [];
 let allPlayers = [];
 let currentDepFilter = 'todos';
 let polling = null;
+
+
+
+async function initPush() {
+  const perm = await Notification.requestPermission();
+
+  if (perm !== "granted") {
+    alert("Permissão negada");
+    return;
+  }
+
+  const token = await messaging.getToken({
+    vapidKey: "BKHdj7KeI3ZmM084-9U1izFN5gXeWb4gAR9kB3kIoE5BmkH6skjsUNX5vt0N6f1vUmrMRexVtIKwXUCzV9mp_8I"
+  });
+
+  console.log("FCM TOKEN:", token);
+
+  // envia pro backend
+  await fetch(API + "/save-token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token })
+  });
+}
 
 // ════════════════════════════════════════════
 // INIT
