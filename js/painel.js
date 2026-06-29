@@ -13,7 +13,7 @@ function renderPainel(el) {
           <div class="pnl-logo brand-logo-wrap">
             <img class="brand-logo-img" src="" alt="logo" style="display:none;max-height:32px;width:auto;object-fit:contain"/>
             <div class="pnl-logo-icon brand-logo-icon">🏆</div>
-            <span class="brand-name">BkWin</span>
+            <span class="brand-name">Bk Jogue</span>
           </div>
           <div class="pnl-header-right">
             <!-- Saldo chip com dropdown -->
@@ -2187,6 +2187,8 @@ wrap.innerHTML = `
 
   return;
 }
+
+      closeModal('modal-saque');
 
       showToast('Saque solicitado!', 'success');
       currentSaldo = parseFloat(data.saldo_novo) || currentSaldo - v;
