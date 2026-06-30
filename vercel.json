@@ -35,7 +35,7 @@
     {
       "source": "/gestao/",
       "destination": "/gestao/index.html"
-    }
+    },
 
     {
       "source": "/gerentes",
