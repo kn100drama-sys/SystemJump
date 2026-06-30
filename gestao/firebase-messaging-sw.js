@@ -52,8 +52,11 @@ self.addEventListener('notificationclick', (event) => {
 
 // Cache básico para funcionar offline
 const CACHE = 'gerente-v1';
-const ASSETS = ['./index.html', './manifest.json'];
-
+const ASSETS = [
+  '/gestao/',
+  '/gestao/index.html',
+  '/gestao/manifest.json'
+];
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE)
