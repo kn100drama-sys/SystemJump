@@ -20,12 +20,9 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[SW] Mensagem em background recebida:', payload);
 
-  const notification = payload.notification || {};
-  const data = payload.data || {};
-
-  const title = notification.title || data.title || 'Afiliado Manager';
-  const body  = notification.body  || data.body  || '';
-  const icon  = notification.icon  || './icon-192.png';
+  const title = payload.notification?.title || 'Afiliado Manager';
+  const body  = payload.notification?.body  || '';
+  const icon  = payload.notification?.icon  || './icon-192.png';
 
   self.registration.showNotification(title, {
     body,
