@@ -1,6 +1,6 @@
 // =====================================================
 // Firebase Messaging Service Worker - /gestao
-// Push Notifications confiáveis (background + fallback)
+// SEM DUPLICAÇÃO (versão correta)
 // =====================================================
 
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
@@ -18,11 +18,12 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+
 // =====================================================
-// 🔥 BACKGROUND (Firebase padrão)
+// 🔥 BACKGROUND MESSAGE (ÚNICO RESPONSÁVEL)
 // =====================================================
 messaging.onBackgroundMessage((payload) => {
-  console.log('[SW] FCM background:', payload);
+  console.log('[SW] Background message:', payload);
 
   const title = payload.notification?.title || 'Gerente Afiliado';
   const body  = payload.notification?.body || '';
@@ -35,32 +36,6 @@ messaging.onBackgroundMessage((payload) => {
     badge: '/gestao/icon-192.png',
     data: { url }
   });
-});
-
-
-// =====================================================
-// 🔥 FALLBACK (GARANTE PUSH MESMO SE FCM FALHAR)
-// =====================================================
-self.addEventListener('push', (event) => {
-  try {
-    const data = event.data ? event.data.json() : {};
-
-    const title = data.notification?.title || 'Gerente Afiliado';
-    const body  = data.notification?.body || '';
-    const url   = data.data?.url || '/gestao';
-
-    event.waitUntil(
-      self.registration.showNotification(title, {
-        body,
-        icon: '/gestao/icon-192.png',
-        badge: '/gestao/icon-192.png',
-        data: { url }
-      })
-    );
-
-  } catch (err) {
-    console.error('[SW] Push error:', err);
-  }
 });
 
 
@@ -79,14 +54,16 @@ self.addEventListener('notificationclick', (event) => {
           return client.focus();
         }
       }
-      if (clients.openWindow) return clients.openWindow(url);
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
     })
   );
 });
 
 
 // =====================================================
-// 🧠 CACHE (SEGURO - SEM QUEBRAR SW)
+// 🧠 CACHE SIMPLES (SEM BUG)
 // =====================================================
 const CACHE = 'gestao-v1';
 
@@ -101,20 +78,14 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
+    caches.open(CACHE).then((cache) => cache.addAll(ASSETS))
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE)
-          .map((key) => caches.delete(key))
-      )
+      Promise.all(keys.map((k) => k !== CACHE && caches.delete(k)))
     )
   );
 
