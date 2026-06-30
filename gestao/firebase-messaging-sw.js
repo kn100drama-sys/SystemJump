@@ -37,7 +37,7 @@ messaging.onBackgroundMessage((payload) => {
 // Clique na notificação → abre/foca o app
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = event.notification.data?.url || '/gestao/';
+  const url = event.notification.data?.url || '/gestao';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
       for (const client of windowClients) {
