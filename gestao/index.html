@@ -883,7 +883,7 @@ async function setupFCM() {
     }
 
     // Register firebase SW
-    const reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+    const reg = await navigator.serviceWorker.register('./gestao/firebase-messaging-sw.js');
     await navigator.serviceWorker.ready;
 
     const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
